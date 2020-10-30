@@ -1,0 +1,141 @@
+date	tier	reg1	reg2
+2020-10-14	2	Cheshire	Cheshire East
+2020-10-14	2	Cheshire	Cheshire West
+2020-10-14	2	Cheshire	Chester
+2020-10-14	2	Cheshire	Warrington
+2020-10-14	2	Derbyshire	parts of High Peak
+2020-10-14	2	Durham	Durham
+2020-10-14	2	Greater Manchester	Bolton
+2020-10-14	2	Greater Manchester	Bury
+2020-10-14	2	Greater Manchester	Manchester
+2020-10-14	2	Greater Manchester	Oldham
+2020-10-14	2	Greater Manchester	Rochdale
+2020-10-14	2	Greater Manchester	Salford
+2020-10-14	2	Greater Manchester	Stockport
+2020-10-14	2	Greater Manchester	Tameside
+2020-10-14	2	Greater Manchester	Trafford
+2020-10-14	2	Greater Manchester	Wigan
+2020-10-14	2	Leicestershire	Leicester
+2020-10-14	2	Leicestershire	Oadby and Wigston
+2020-10-14	2	Northumberland	Northumberland
+2020-10-14	2	Nottinghamshire	Ashfield
+2020-10-14	2	Nottinghamshire	Bassetlaw
+2020-10-14	2	Nottinghamshire	Broxtowe
+2020-10-14	2	Nottinghamshire	Gedling
+2020-10-14	2	Nottinghamshire	Mansfield
+2020-10-14	2	Nottinghamshire	Newark & Sherwood
+2020-10-14	2	Nottinghamshire	Nottingham
+2020-10-14	2	Nottinghamshire	Rushcliffe
+2020-10-14	2	South Yorkshire	Barnsley
+2020-10-14	2	South Yorkshire	Doncaster
+2020-10-14	2	South Yorkshire	Rotherham
+2020-10-14	2	South Yorkshire	Sheffield
+2020-10-14	2	Tees Valley	Darlington
+2020-10-14	2	Tees Valley	Hartlepool
+2020-10-14	2	Tees Valley	Middlesbrough
+2020-10-14	2	Tees Valley	Redcar and Cleveland
+2020-10-14	2	Tees Valley	Stockton-on-Tees
+2020-10-14	2	Tyne and Wear	Gateshead
+2020-10-14	2	Tyne and Wear	Newcastle
+2020-10-14	2	Tyne and Wear	North Tyneside
+2020-10-14	2	Tyne and Wear	South Tyneside
+2020-10-14	2	Tyne and Wear	Sunderland
+2020-10-14	2	West Midlands	Birmingham
+2020-10-14	2	West Midlands	Sandwell
+2020-10-14	2	West Midlands	Solihull
+2020-10-14	2	West Midlands	Wolverhampton
+2020-10-14	2	West Midlands	Walsall
+2020-10-14	2	West Yorkshire	Bradford
+2020-10-14	2	West Yorkshire	Calderdale
+2020-10-14	2	West Yorkshire	Kirklees
+2020-10-14	2	West Yorkshire	Leeds
+2020-10-14	2	West Yorkshire	Wakefield.
+2020-10-17	2	Cumbria	Barrow-in-Furness
+2020-10-17	2	Derbyshire	Chesterfield
+2020-10-17	2	Derbyshire	Erewash
+2020-10-17	2	Derbyshire	North East Derbyshire
+2020-10-17	2	Essex	Basildon
+2020-10-17	2	Essex	Braintree
+2020-10-17	2	Essex	Brentwood
+2020-10-17	2	Essex	Castle Point
+2020-10-17	2	Essex	Chelmsford
+2020-10-17	2	Essex	Colchester
+2020-10-17	2	Essex	Epping Forest
+2020-10-17	2	Essex	Harlow
+2020-10-17	2	Essex	Maldon
+2020-10-17	2	Essex	Rochford
+2020-10-17	2	Essex	Tendring
+2020-10-17	2	Essex	Uttlesford
+2020-10-17	2	Greater London	City of London
+2020-10-17	2	Greater London	Barking and Dagenham
+2020-10-17	2	Greater London	Barnet
+2020-10-17	2	Greater London	Bexley
+2020-10-17	2	Greater London	Brent
+2020-10-17	2	Greater London	Bromley
+2020-10-17	2	Greater London	Camden
+2020-10-17	2	Greater London	Croydon
+2020-10-17	2	Greater London	Ealing
+2020-10-17	2	Greater London	Enfield
+2020-10-17	2	Greater London	Greenwich
+2020-10-17	2	Greater London	Hackney
+2020-10-17	2	Greater London	Hammersmith and Fulham
+2020-10-17	2	Greater London	Haringey
+2020-10-17	2	Greater London	Harrow
+2020-10-17	2	Greater London	Havering
+2020-10-17	2	Greater London	Hillingdon
+2020-10-17	2	Greater London	Hounslow
+2020-10-17	2	Greater London	Islington
+2020-10-17	2	Greater London	Kensington and Chelsea
+2020-10-17	2	Greater London	Kingston upon Thames
+2020-10-17	2	Greater London	Lambeth
+2020-10-17	2	Greater London	Lewisham
+2020-10-17	2	Greater London	Merton
+2020-10-17	2	Greater London	Newham
+2020-10-17	2	Greater London	Redbridge
+2020-10-17	2	Greater London	Richmond upon Thames
+2020-10-17	2	Greater London	Southwark
+2020-10-17	2	Greater London	Sutton
+2020-10-17	2	Greater London	Tower Hamlets
+2020-10-17	2	Greater London	Waltham Forest
+2020-10-17	2	Greater London	Wandsworth
+2020-10-17	2	Greater London	Westminster
+2020-10-17	2	North Yorkshire	York
+2020-10-17	2	Surrey	Elmbridge
+2020-10-17	3	Liverpool region	Halton
+2020-10-17	3	Liverpool region	Knowsley
+2020-10-17	3	Liverpool region	Liverpool
+2020-10-17	3	Liverpool region	Sefton
+2020-10-17	3	Liverpool region	St Helens
+2020-10-17	3	Liverpool region	Wirral
+2020-10-17	3	Lancashire	Blackpool
+2020-10-17	3	Lancashire	Blackburn with Darwen
+2020-10-17	3	Lancashire	Burnley
+2020-10-17	3	Lancashire	Chorley
+2020-10-17	3	Lancashire	Fylde
+2020-10-17	3	Lancashire	Hyndburn
+2020-10-17	3	Lancashire	Lancaster City Council
+2020-10-17	3	Lancashire	Pendle
+2020-10-17	3	Lancashire	Preston
+2020-10-17	3	Lancashire	Ribble Valley
+2020-10-17	3	Lancashire	Rossendale
+2020-10-17	3	Lancashire	South Ribble
+2020-10-17	3	Lancashire	West Lancashire
+2020-10-17	3	Lancashire	Wyre
+2020-10-23	3	Greater Manchester	Bolton
+2020-10-23	3	Greater Manchester	Bury
+2020-10-23	3	Greater Manchester	Manchester
+2020-10-23	3	Greater Manchester	Oldham
+2020-10-23	3	Greater Manchester	Rochdale
+2020-10-23	3	Greater Manchester	Salford
+2020-10-23	3	Greater Manchester	Stockport
+2020-10-23	3	Greater Manchester	Tameside
+2020-10-23	3	Greater Manchester	Trafford
+2020-10-23	3	Greater Manchester	Wigan
+2020-10-24	2	Berkshire	Slough
+2020-10-24	2	Staffordshire	Stoke-on-Trent
+2020-10-24	2	West Midlands	Coventry
+2020-10-24	3	South Yorkshire	Barnsley
+2020-10-24	3	South Yorkshire	Doncaster
+2020-10-24	3	South Yorkshire	Rotherham
+2020-10-24	3	South Yorkshire	Sheffield
+2020-10-27	3	Cheshire	Warrington

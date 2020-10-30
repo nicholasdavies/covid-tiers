@@ -1,0 +1,126 @@
+string,match,attr
+Cheshire | Cheshire East,Cheshire East,sub_region_1
+Cheshire | Cheshire West,Cheshire West and Chester,sub_region_1
+Cheshire | Chester,Cheshire West and Chester,sub_region_1
+Cheshire | Warrington,Warrington,sub_region_1
+Derbyshire | parts of High Peak,High Peak District,sub_region_2
+Durham | Durham,County Durham,sub_region_1
+Greater Manchester | Bolton,Bolton District,sub_region_2
+Greater Manchester | Bury,Bury District,sub_region_2
+Greater Manchester | Manchester,Manchester,sub_region_2
+Greater Manchester | Oldham,Oldham District,sub_region_2
+Greater Manchester | Rochdale,Rochdale District,sub_region_2
+Greater Manchester | Salford,Salford District,sub_region_2
+Greater Manchester | Stockport,Metropolitan Borough of Stockport,sub_region_2
+Greater Manchester | Tameside,Borough of Tameside,sub_region_2
+Greater Manchester | Trafford,Trafford,sub_region_2
+Greater Manchester | Wigan,Metropolitan Borough of Wigan,sub_region_2
+Leicestershire | Leicester,Leicester,sub_region_1
+Leicestershire | Oadby and Wigston,Oadby and Wigston District,sub_region_2
+Northumberland | Northumberland,Northumberland,sub_region_1
+Nottinghamshire | Ashfield,Ashfield District,sub_region_2
+Nottinghamshire | Bassetlaw,Bassetlaw District,sub_region_2
+Nottinghamshire | Broxtowe,Broxtowe District,sub_region_2
+Nottinghamshire | Gedling,Gedling District,sub_region_2
+Nottinghamshire | Mansfield,Mansfield District,sub_region_2
+Nottinghamshire | Newark & Sherwood,Newark and Sherwood District,sub_region_2
+Nottinghamshire | Nottingham,Nottingham,sub_region_1
+Nottinghamshire | Rushcliffe,Rushcliffe District,sub_region_2
+South Yorkshire | Barnsley,Borough of Barnsley,sub_region_2
+South Yorkshire | Doncaster,Doncaster District,sub_region_2
+South Yorkshire | Rotherham,Rotherham District,sub_region_2
+South Yorkshire | Sheffield,Sheffield District,sub_region_2
+Tees Valley | Darlington,Darlington,sub_region_1
+Tees Valley | Hartlepool,Hartlepool,sub_region_1
+Tees Valley | Middlesbrough,Middlesbrough,sub_region_1
+Tees Valley | Redcar and Cleveland,Redcar and Cleveland,sub_region_1
+Tees Valley | Stockton-on-Tees,Stockton-on-Tees,sub_region_1
+Tyne and Wear | Gateshead,Metropolitan Borough of Gateshead,sub_region_2
+Tyne and Wear | Newcastle,Newcastle upon Tyne District,sub_region_2
+Tyne and Wear | North Tyneside,North Tyneside District,sub_region_2
+Tyne and Wear | South Tyneside,South Tyneside,sub_region_2
+Tyne and Wear | Sunderland,Sunderland District,sub_region_2
+West Midlands | Birmingham,Birmingham District,sub_region_2
+West Midlands | Sandwell,Sandwell District,sub_region_2
+West Midlands | Solihull,Metropolitan Borough of Solihull,sub_region_2
+West Midlands | Wolverhampton,City of Wolverhampton District,sub_region_2
+West Midlands | Walsall,Walsall District,sub_region_2
+West Yorkshire | Bradford,Bradford District,sub_region_2
+West Yorkshire | Calderdale,Calderdale,sub_region_2
+West Yorkshire | Kirklees,Metropolitan Borough of Kirklees,sub_region_2
+West Yorkshire | Leeds,Leeds District,sub_region_2
+West Yorkshire | Wakefield.,Wakefield District,sub_region_2
+Cumbria | Barrow-in-Furness,Barrow-in-Furness District,sub_region_2
+Derbyshire | Chesterfield,Chesterfield District,sub_region_2
+Derbyshire | Erewash,Erewash District,sub_region_2
+Derbyshire | North East Derbyshire,North East Derbyshire District,sub_region_2
+Essex | Basildon,Basildon District,sub_region_2
+Essex | Braintree,Braintree District,sub_region_2
+Essex | Brentwood,Brentwood District,sub_region_2
+Essex | Castle Point,Castle Point District,sub_region_2
+Essex | Chelmsford,Chelmsford,sub_region_2
+Essex | Colchester,Borough of Colchester,sub_region_2
+Essex | Epping Forest,Epping Forest District,sub_region_2
+Essex | Harlow,Harlow District,sub_region_2
+Essex | Maldon,Maldon District,sub_region_2
+Essex | Rochford,Rochford District,sub_region_2
+Essex | Tendring,Tendring District,sub_region_2
+Essex | Uttlesford,Uttlesford,sub_region_2
+Greater London | City of London,City of London,sub_region_2
+Greater London | Barking and Dagenham,London Borough of Barking and Dagenham,sub_region_2
+Greater London | Barnet,London Borough of Barnet,sub_region_2
+Greater London | Bexley,London Borough of Bexley,sub_region_2
+Greater London | Brent,London Borough of Brent,sub_region_2
+Greater London | Bromley,London Borough of Bromley,sub_region_2
+Greater London | Camden,London Borough of Camden,sub_region_2
+Greater London | Croydon,London Borough of Croydon,sub_region_2
+Greater London | Ealing,London Borough of Ealing,sub_region_2
+Greater London | Enfield,London Borough of Enfield,sub_region_2
+Greater London | Greenwich,Royal Borough of Greenwich,sub_region_2
+Greater London | Hackney,London Borough of Hackney,sub_region_2
+Greater London | Hammersmith and Fulham,London Borough of Hammersmith and Fulham,sub_region_2
+Greater London | Haringey,London Borough of Haringey,sub_region_2
+Greater London | Harrow,London Borough of Harrow,sub_region_2
+Greater London | Havering,London Borough of Havering,sub_region_2
+Greater London | Hillingdon,London Borough of Hillingdon,sub_region_2
+Greater London | Hounslow,London Borough of Hounslow,sub_region_2
+Greater London | Islington,London Borough of Islington,sub_region_2
+Greater London | Kensington and Chelsea,Royal Borough of Kensington and Chelsea,sub_region_2
+Greater London | Kingston upon Thames,Royal Borough of Kingston upon Thames,sub_region_2
+Greater London | Lambeth,London Borough of Lambeth,sub_region_2
+Greater London | Lewisham,London Borough of Lewisham,sub_region_2
+Greater London | Merton,London Borough of Merton,sub_region_2
+Greater London | Newham,London Borough of Newham,sub_region_2
+Greater London | Redbridge,London Borough of Redbridge,sub_region_2
+Greater London | Richmond upon Thames,London Borough of Richmond upon Thames,sub_region_2
+Greater London | Southwark,London Borough of Southwark,sub_region_2
+Greater London | Sutton,London Borough of Sutton,sub_region_2
+Greater London | Tower Hamlets,London Borough of Tower Hamlets,sub_region_2
+Greater London | Waltham Forest,London Borough of Waltham Forest,sub_region_2
+Greater London | Wandsworth,London Borough of Wandsworth,sub_region_2
+Greater London | Westminster,City of Westminster,sub_region_2
+North Yorkshire | York,York,sub_region_1
+Surrey | Elmbridge,Elmbridge,sub_region_2
+Liverpool region | Halton,Borough of Halton,sub_region_1
+Liverpool region | Knowsley,Metropolitan Borough of Knowsley,sub_region_2
+Liverpool region | Liverpool,Liverpool,sub_region_2
+Liverpool region | Sefton,Metropolitan Borough of Sefton,sub_region_2
+Liverpool region | St Helens,Saint Helens District,sub_region_2
+Liverpool region | Wirral,Wirral,sub_region_2
+Lancashire | Blackpool,Blackpool,sub_region_1
+Lancashire | Blackburn with Darwen,Blackburn with Darwen,sub_region_1
+Lancashire | Burnley,Borough of Burnley,sub_region_2
+Lancashire | Chorley,Chorley District,sub_region_2
+Lancashire | Fylde,Borough of Fylde,sub_region_2
+Lancashire | Hyndburn,Hyndburn,sub_region_2
+Lancashire | Lancaster City Council,Lancaster District,sub_region_2
+Lancashire | Pendle,Pendle District,sub_region_2
+Lancashire | Preston,City of Preston,sub_region_2
+Lancashire | Ribble Valley,Ribble Valley District,sub_region_2
+Lancashire | Rossendale,Rossendale,sub_region_2
+Lancashire | South Ribble,South Ribble District,sub_region_2
+Lancashire | West Lancashire,West Lancashire District,sub_region_2
+Lancashire | Wyre,Wyre District,sub_region_2
+Berkshire | Slough,Slough,sub_region_1
+Staffordshire | Stoke-on-Trent,Stoke-on-Trent,sub_region_1
+West Midlands | Coventry,Coventry,sub_region_2

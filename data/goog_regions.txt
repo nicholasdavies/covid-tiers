@@ -1,0 +1,158 @@
+gss_code,match_name,gss_name,goog_name,region_name,mappings,population
+E06000001,Hartlepool,Hartlepool,Hartlepool,North East and Yorkshire,1,93242
+E06000002,Middlesbrough,Middlesbrough,Middlesbrough,North East and Yorkshire,1,140545
+E06000003,Redcar and Cleveland,Redcar and Cleveland,Redcar and Cleveland,North East and Yorkshire,1,136718
+E06000004,Stockton-on-Tees,Stockton-on-Tees,Stockton-on-Tees,North East and Yorkshire,1,197213
+E06000005,Darlington,Darlington,Darlington,North East and Yorkshire,1,106566
+E06000006,Halton,Halton,Borough of Halton,North West,1,128432
+E06000007,Warrington,Warrington,Warrington,North West,1,209547
+E06000008,Blackburn with Darwen,Blackburn with Darwen,Blackburn with Darwen,North West,1,148942
+E06000009,Blackpool,Blackpool,Blackpool,North West,1,139305
+E06000010,Kingston upon Hull,"Kingston upon Hull, City of",Kingston upon Hull,North East and Yorkshire,1,260645
+E06000011,East Riding of Yorkshire,East Riding of Yorkshire,East Riding of Yorkshire,North East and Yorkshire,1,339614
+E06000012,North East Lincolnshire,North East Lincolnshire,North East Lincolnshire,North East and Yorkshire,1,159821
+E06000013,North Lincolnshire,North Lincolnshire,North Lincolnshire,North East and Yorkshire,1,172005
+E06000014,York,York,York,North East and Yorkshire,1,209893
+E06000015,Derby,Derby,Derby,Midlands,1,257174
+E06000016,Leicester,Leicester,Leicester,Midlands,1,355218
+E06000017,Rutland,Rutland,Rutland,Midlands,1,39697
+E06000018,Nottingham,Nottingham,Nottingham,Midlands,1,331069
+E06000019,Herefordshire,"Herefordshire, County of",Herefordshire,Midlands,1,192107
+E06000021,Stoke-on-Trent,Stoke-on-Trent,Stoke-on-Trent,Midlands,1,255833
+E06000022,Bath and North East Somerset,Bath and North East Somerset,Bath and North East Somerset,South West,1,192106
+E06000023,Bristol,"Bristol, City of",Bristol,South West,1,463405
+E06000024,North Somerset,North Somerset,North Somerset,South West,1,213919
+E06000025,South Gloucestershire,South Gloucestershire,South Gloucestershire,South West,1,282644
+E06000026,Plymouth,Plymouth,Plymouth,South West,1,263100
+E06000027,Torbay,Torbay,Torbay,South West,1,135780
+E06000030,Swindon,Swindon,Swindon,South West,1,221996
+E06000031,Peterborough,Peterborough,Peterborough,East of England,1,201041
+E06000032,Luton,Luton,Luton,East of England,1,214109
+E06000033,Southend-on-Sea,Southend-on-Sea,Southend-on-Sea,East of England,1,182463
+E06000034,Thurrock,Thurrock,Thurrock,East of England,1,172525
+E06000035,Medway,Medway,Medway,South East,1,277855
+E06000036,Bracknell Forest,Bracknell Forest,Bracknell Forest,South East,1,121676
+E06000037,West Berkshire,West Berkshire,West Berkshire,South East,1,158527
+E06000038,Reading,Reading,Reading,South East,1,163203
+E06000039,Slough,Slough,Slough,South East,1,149112
+E06000040,Windsor and Maidenhead,Windsor and Maidenhead,Windsor and Maidenhead,South East,1,150906
+E06000041,Wokingham,Wokingham,Wokingham,South East,1,167979
+E06000042,Milton Keynes,Milton Keynes,Milton Keynes,East of England,1,268607
+E06000043,Brighton and Hove,Brighton and Hove,Brighton and Hove,South East,1,290395
+E06000044,Portsmouth,Portsmouth,Portsmouth,South East,1,215133
+E06000045,Southampton,Southampton,Southampton,South East,1,252796
+E06000046,Isle of Wight,Isle of Wight,Isle of Wight,South East,1,141538
+E06000047,County Durham,County Durham,County Durham,North East and Yorkshire,1,526980
+E06000049,Cheshire East,Cheshire East,Cheshire East,North West,1,380790
+E06000050,Cheshire West and Chester,Cheshire West and Chester,Cheshire West and Chester,North West,1,340502
+E06000051,Shropshire,Shropshire,Shropshire,Midlands,1,320274
+E06000052,Cornwall,Cornwall,Cornwall,South West,1,565968
+E06000054,Wiltshire,Wiltshire,Wiltshire,South West,1,498064
+E06000055,Bedford,Bedford,Bedford,East of England,1,171623
+E06000056,Central Bedfordshire,Central Bedfordshire,Central Bedfordshire,East of England,1,283606
+E06000057,Northumberland,Northumberland,Northumberland,North East and Yorkshire,1,320274
+E06000059,Dorset,Dorset,Dorset,South West,1,376484
+E10000002,Buckinghamshire,Buckinghamshire,Buckinghamshire,South East,1,540059
+E10000003,Cambridgeshire,Cambridgeshire,Cambridgeshire,East of England,1,651482
+E10000006,Cumbria,Cumbria,Cumbria,North East and Yorkshire,2,498888
+E10000006,Cumbria,Cumbria,Cumbria,North West,2,498888
+E10000007,Derbyshire,Derbyshire,Derbyshire,North West,2,796142
+E10000007,Derbyshire,Derbyshire,Derbyshire,Midlands,2,796142
+E10000008,Devon,Devon,Devon,South West,1,795286
+E10000011,East Sussex,East Sussex,East Sussex,South East,1,554590
+E10000012,Essex,Essex,Essex,East of England,1,1477764
+E10000013,Gloucestershire,Gloucestershire,Gloucestershire,South West,1,633558
+E10000014,Hampshire,Hampshire,Hampshire,South East,1,1376316
+E10000015,Hertfordshire,Hertfordshire,Hertfordshire,East of England,1,1184365
+E10000016,Kent,Kent,Kent,South East,1,1568623
+E10000017,Lancashire,Lancashire,Lancashire,North West,1,1210053
+E10000018,Leicestershire,Leicestershire,Leicestershire,Midlands,1,698268
+E10000019,Lincolnshire,Lincolnshire,Lincolnshire,Midlands,1,755833
+E10000020,Norfolk,Norfolk,Norfolk,East of England,1,903680
+E10000021,Northamptonshire,Northamptonshire,Northamptonshire,East of England,2,747622
+E10000021,Northamptonshire,Northamptonshire,Northamptonshire,Midlands,2,747622
+E10000023,North Yorkshire,North Yorkshire,North Yorkshire,North East and Yorkshire,2,614505
+E10000023,North Yorkshire,North Yorkshire,North Yorkshire,North West,2,614505
+E10000024,Nottinghamshire,Nottinghamshire,Nottinghamshire,North East and Yorkshire,2,823126
+E10000024,Nottinghamshire,Nottinghamshire,Nottinghamshire,Midlands,2,823126
+E10000025,Oxfordshire,Oxfordshire,Oxfordshire,South East,2,687524
+E10000025,Oxfordshire,Oxfordshire,Oxfordshire,South West,2,687524
+E10000027,Somerset,Somerset,Somerset,South West,1,559399
+E10000028,Staffordshire,Staffordshire,Staffordshire,Midlands,1,875219
+E10000029,Suffolk,Suffolk,Suffolk,East of England,1,758556
+E10000030,Surrey,Surrey,Surrey,South East,1,1189934
+E10000031,Warwickshire,Warwickshire,Warwickshire,Midlands,1,571010
+E10000032,West Sussex,West Sussex,West Sussex,South East,1,858852
+E10000034,Worcestershire,Worcestershire,Worcestershire,Midlands,1,592057
+E11000001,Manchester,Greater Manchester,Greater Manchester,North West,1,2812569
+E11000002,Merseyside,Merseyside,Merseyside,North West,1,1423065
+E11000003,South Yorkshire,South Yorkshire,South Yorkshire,North East and Yorkshire,1,1402918
+E11000005,West Midlands,West Midlands,West Midlands,Midlands,1,2916458
+E11000006,West Yorkshire,West Yorkshire,West Yorkshire,North East and Yorkshire,1,2320214
+E11000007,Tyne and Wear,Tyne and Wear,Tyne and Wear,North East and Yorkshire,1,1136371
+E12000007,London,London,Greater London,London,1,8908081
+N09000001,Antrim and Newtownabbey,Antrim and Newtownabbey,Antrim and Newtownabbey,Northern Ireland,1,142492
+N09000002,Armagh Banbridge and Craigavon,"Armagh City, Banbridge and Craigavon","Armagh City, Banbridge and Craigavon",Northern Ireland,1,214090
+N09000003,Belfast,Belfast,Belfast,Northern Ireland,1,341877
+N09000004,Causeway Coast and Glens,Causeway Coast and Glens,Causeway Coast and Glens,Northern Ireland,1,144246
+N09000005,Derry and Strabane,Derry City and Strabane,Derry and Strabane,Northern Ireland,1,150679
+N09000006,Fermanagh and Omagh,Fermanagh and Omagh,Fermanagh and Omagh,Northern Ireland,1,116835
+N09000007,Lisburn and Castlereagh,Lisburn and Castlereagh,Lisburn and Castlereagh,Northern Ireland,1,144381
+N09000008,Mid and East Antrim,Mid and East Antrim,Mid and East Antrim,Northern Ireland,1,138773
+N09000009,Mid Ulster,Mid Ulster,Mid Ulster,Northern Ireland,1,147392
+N09000010,Newry Mourne and Down,"Newry, Mourne and Down","Newry, Mourne and Down",Northern Ireland,1,180012
+N09000011,Ards and North Down,Ards and North Down,Ards and North Down,Northern Ireland,1,160864
+S12000005,Clackmannanshire,Clackmannanshire,Clackmannanshire,Scotland,1,51400
+S12000006,Dumfries and Galloway,Dumfries and Galloway,Dumfries and Galloway,Scotland,1,148790
+S12000008,East Ayrshire,East Ayrshire,East Ayrshire Council,Scotland,1,121840
+S12000010,East Lothian,East Lothian,East Lothian Council,Scotland,1,105790
+S12000011,East Renfrewshire,East Renfrewshire,East Renfrewshire Council,Scotland,1,95170
+S12000013,Na h-Eileanan Siar,Na h-Eileanan Siar,Na h-Eileanan Siar,Scotland,1,26830
+S12000014,Falkirk,Falkirk,Falkirk,Scotland,1,160340
+S12000017,Highland,Highland,Highland Council,Scotland,1,235540
+S12000018,Inverclyde,Inverclyde,Inverclyde,Scotland,1,78150
+S12000019,Midlothian,Midlothian,Midlothian,Scotland,1,91340
+S12000020,Moray,Moray,Moray,Scotland,1,95520
+S12000021,North Ayrshire,North Ayrshire,North Ayrshire Council,Scotland,1,135280
+S12000023,Orkney,Orkney Islands,Orkney,Scotland,1,22190
+S12000026,Scottish Borders,Scottish Borders,Scottish Borders,Scotland,1,115270
+S12000027,Shetland,Shetland Islands,Shetland Islands,Scotland,1,22990
+S12000028,South Ayrshire,South Ayrshire,South Ayrshire Council,Scotland,1,112550
+S12000029,South Lanarkshire,South Lanarkshire,South Lanarkshire,Scotland,1,319020
+S12000030,Stirling,Stirling,Stirling,Scotland,1,94330
+S12000033,Aberdeen,Aberdeen City,Aberdeen City,Scotland,1,227560
+S12000034,Aberdeenshire,Aberdeenshire,Aberdeenshire,Scotland,1,261470
+S12000035,Argyll and Bute,Argyll and Bute,Argyll and Bute Council,Scotland,1,86260
+S12000036,Edinburgh,City of Edinburgh,Edinburgh,Scotland,1,518500
+S12000038,Renfrewshire,Renfrewshire,Renfrewshire,Scotland,1,177790
+S12000039,West Dunbartonshire,West Dunbartonshire,West Dunbartonshire Council,Scotland,1,89130
+S12000040,West Lothian,West Lothian,West Lothian,Scotland,1,182140
+S12000041,Angus,Angus,Angus Council,Scotland,1,116040
+S12000042,Dundee,Dundee City,Dundee City Council,Scotland,1,148750
+S12000045,East Dunbartonshire,East Dunbartonshire,East Dunbartonshire Council,Scotland,1,108330
+S12000047,Fife,Fife,Fife,Scotland,1,371910
+S12000048,Perth and Kinross,Perth and Kinross,Perth and Kinross,Scotland,1,151290
+S12000049,Glasgow,Glasgow City,Glasgow City,Scotland,1,626410
+S12000050,North Lanarkshire,North Lanarkshire,North Lanarkshire,Scotland,1,340180
+W06000001,Isle of Anglesey,Isle of Anglesey,Isle of Anglesey,Wales,1,69961
+W06000002,Gwynedd,Gwynedd,Gwynedd,Wales,1,124178
+W06000003,Conwy,Conwy,Conwy Principal Area,Wales,1,117181
+W06000004,Denbighshire,Denbighshire,Denbighshire,Wales,1,95330
+W06000005,Flintshire,Flintshire,Flintshire,Wales,1,155593
+W06000006,Wrexham,Wrexham,Wrexham Principal Area,Wales,1,136126
+W06000008,Ceredigion,Ceredigion,Ceredigion,Wales,1,72992
+W06000009,Pembrokeshire,Pembrokeshire,Pembrokeshire,Wales,1,125055
+W06000010,Carmarthenshire,Carmarthenshire,Carmarthenshire,Wales,1,187568
+W06000011,Swansea,Swansea,Swansea,Wales,1,246466
+W06000012,Neath Port Talbot,Neath Port Talbot,Neath Port Talbot Principle Area,Wales,1,142906
+W06000013,Bridgend,Bridgend,Bridgend County Borough,Wales,1,144876
+W06000014,Vale of Glamorgan,Vale of Glamorgan,Vale of Glamorgan,Wales,1,132165
+W06000015,Cardiff,Cardiff,Cardiff,Wales,1,364248
+W06000016,Rhondda Cynon Taf,Rhondda Cynon Taf,Rhondda Cynon Taf,Wales,1,240131
+W06000018,Caerphilly,Caerphilly,Caerphilly County Borough,Wales,1,181019
+W06000019,Blaenau Gwent,Blaenau Gwent,Blaenau Gwent,Wales,1,69713
+W06000020,Torfaen,Torfaen,Torfaen Principal Area,Wales,1,93049
+W06000021,Monmouthshire,Monmouthshire,Monmouthshire,Wales,1,94142
+W06000022,Newport,Newport,Newport,Wales,1,153302
+W06000023,Powys,Powys,Powys,Wales,1,132447
+W06000024,Merthyr Tydfil,Merthyr Tydfil,Merthyr Tydfil County Borough,Wales,1,60183
