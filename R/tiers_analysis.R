@@ -218,7 +218,7 @@ ggplot(resultsD[indic != "Parks"]) +
     labs(x = "Date", y = "Google Mobility indices, minus weekday effect, detrended", colour = "Tier")
 ggsave("./figures/tiers_analysis_4.png", width = 25, height = 15, units = "cm")
 
-# next: 
+# Impact of tiers
 individual = resultsD[tier != "T 0", .(detrend = mean(detrend), baseline = mean(original), change = mean(detrend - baseline)), 
     by = .(full_region, sub_region_1, indic, tier)]
 summary = individual[, .(change = mean(change)), keyby = .(indic, tier)]
