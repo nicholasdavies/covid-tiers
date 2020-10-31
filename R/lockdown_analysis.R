@@ -67,6 +67,8 @@ ggplot(compare) +
     geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
     facet_wrap(~variable)
 
+
+
 # Wales
 iso3166 = fread("./data/county_iso3166_2_gb.csv")
 
@@ -82,7 +84,7 @@ ggplot(gm_w) +
     facet_wrap(~variable) +
     theme(legend.position = "none")
 
-# Compare post-lockdown values to pre-lockdown values (2 week lookback)
+# Compare post-lockdown values to pre-lockdown values (1 week lookback)
 compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-27")) & variable != "parks"]
 compare = merge(compare,
     gm_w[date %between% c(ymd("2020-10-24", "2020-10-27") - 7) & variable != "parks", 
@@ -100,6 +102,48 @@ compare[, mean(change), by = variable]
 # 4:      transit_stations -21.390237
 # 5:            workplaces -22.727273
 
+
+# Visual comparison
+ggplot(compare) +
+    geom_point(aes(x = date, y = change)) + 
+    geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
+    facet_wrap(~variable)
+
+
+
+# Scotland
+iso3166 = fread("./data/county_iso3166_2_gb.csv")
+
+scot_iso3166 = iso3166[gss_code %like% "^S" & iso_code != "", unique(iso_code)];
+gm_s = gm[iso_3166_2_code %in% scot_iso3166, lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = 9:14, by = .(date)]
+gm_s = melt(gm_s, id.vars = "date")
+gm_s[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
+
+# Plot Scotland google mobility data
+ggplot(gm_s) + 
+    geom_line(aes(x = date, y = rollmean(value, k = 7, fill = "extend"), colour = variable)) +
+    geom_vline(aes(xintercept = ymd("2020-10-09"))) +
+    geom_vline(aes(xintercept = ymd("2020-10-25"))) +
+    facet_wrap(~variable) +
+    theme(legend.position = "none")
+
+# Compare post-lockdown values to pre-lockdown values (2 week lookback)
+compare = gm_s[date %between% c(ymd("2020-10-10", "2020-10-24")) & variable != "parks"]
+compare = merge(compare,
+    gm_s[date %between% c(ymd("2020-10-10", "2020-10-24") - 14) & variable != "parks", 
+        .(date = date + 14, variable, baseline = value)],
+    by = c("date", "variable"))
+compare = compare[order(date, variable)]
+compare[, change := value - baseline]
+compare[, mean(change), by = variable]
+
+# IMPACT OF LOCKDOWN FOR SCOTLAND:
+#                 variable         V1
+# 1:  grocery_and_pharmacy  0.5931034
+# 2:           residential  2.0497126
+# 3: retail_and_recreation -7.0221675
+# 4:      transit_stations -6.6267492
+# 5:            workplaces -8.2720801
 
 # Visual comparison
 ggplot(compare) +
