@@ -227,8 +227,8 @@ pnum[, study := "POLYMOD"]
 num = rbind(num, pnum, fill = TRUE)
 
 ## Add weekday weights
-num[,weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE)]
-num[,weekday_weights := ifelse(weekday %in% c("Saturday", "Sunday"), 2,5)]
+num[,weekday := factor(lubridate::wday(date, label = TRUE), ordered = FALSE)]
+num[,weekday_weights := ifelse(weekday %in% c("Sat", "Sun"), 2,5)]
 
 num[, retail_recreation := (100 + retail_recreation) * 0.01]
 num[, grocery_pharmacy  := (100 + grocery_pharmacy ) * 0.01]
@@ -259,11 +259,13 @@ asc = function(x, y0, y1, s0, s1)
 }
 
 ## Weighted means accounting for weekdays. 
-wm <- function(x)   weighted.mean(x, weekday_weights)
+w.mean <- function(x, y, ...)   weighted.mean(x, y, ...)
 
 
 # *** Home model
-another = num[, .(home = wm(home), residential = mean(residential), transit = mean(transit_stations)), 
+another = num[, .(home = w.mean(home, weekday_weights), 
+                  residential = w.mean(residential, weekday_weights), 
+                  transit = w.mean(transit_stations, weekday_weights)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2 * 2, rep(0, length(date))), study)]
 
 home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pandemic", "pre-pandemic"))]
@@ -289,7 +291,10 @@ ggplot(another) +
     geom_smooth(aes(x = transit, y = home), method = "gam", formula = y ~ s(x))
 
 # Alternative: Home, non household member
-another = num[, .(home = mean(home), non_hh = mean(e_home_non_hh), residential = mean(residential), transit = mean(transit_stations)), 
+another = num[, .(home = w.mean(home, weekday_weights), 
+                  non_hh = w.mean(e_home_non_hh, weekday_weights), 
+                  residential = w.mean(residential, weekday_weights), 
+                  transit = w.mean(transit_stations), weekday_weights), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2, rep(0, length(date))), study)]
 
 #home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pre-pandemic", "pandemic"))]
@@ -314,9 +319,12 @@ ggplot(another) +
 
 # Alternative: Other house
 # TODO go back up and fix NAs in e_other_house . . .
-another = num[, .(other = mean(other), other_house = mean(e_other_house, na.rm = T), 
-    residential = mean(residential), retail = mean(retail_recreation), 
-    grocery = mean(grocery_pharmacy), transit = mean(transit_stations)), 
+another = num[, .(other = w.mean(other, weekday_weights), 
+                  other_house = w.mean(e_other_house,  weekday_weights, na.rm = T), 
+                  residential = w.mean(residential, weekday_weights), 
+                  retail = w.mean(retail_recreation, weekday_weights), 
+                  grocery = w.mean(grocery_pharmacy, weekday_weights), 
+                  transit = w.mean(transit_stations, weekday_weights)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2, rep(0, length(date))), study)]
 
 another[, predictor := retail * 0.345 + transit * 0.445 + grocery * 0.210]
@@ -343,7 +351,10 @@ ggplot(another) +
 
 
 # *** Work model
-another = num[part_age %between% c(18, 65), .(work = mean(work), workplaces = mean(workplaces), transit = mean(transit_stations)), 
+another = num[part_age %between% c(18, 65), 
+              .(work = w.mean(work, weekday_weights), 
+                workplaces = w.mean(workplaces, weekday_weights), 
+                transit = w.mean(transit_stations, weekday_weights)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2, rep(0, length(date))), study)]
 
 model = gam(work ~ s(workplaces), family = gaussian, data = another)
@@ -357,6 +368,8 @@ plw = ggplot(another) +
     labs(x = "Google Mobility\n'workplaces' visits", y = "Work contacts", colour = "Study") +
     theme(legend.position = "none")
 
+
+
 # Alternative work models
 
 model3 = gam(work ~ s(workplaces), family = gaussian, data = another)
@@ -366,7 +379,8 @@ summary(model3)
 plot(model3)
 
 # *** School model
-another = num[part_age %between% c(0, 18), .(school = mean(school), residential = mean(residential)), 
+another = num[part_age %between% c(0, 18), .(school = w.mean(school, weekday_weights),
+                                             residential = w.mean(residential, weekday_weights)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2 * 2, rep(0, length(date))), study)]
 
 days = data.table(x = 0:365)
@@ -379,8 +393,10 @@ pls = ggplot(another) +
 
 
 # *** Other model
-another = num[, .(other = mean(other), retail = mean(retail_recreation), 
-    grocery = mean(grocery_pharmacy), transit = mean(transit_stations)), 
+another = num[, .(other = w.mean(other, weekday_weights), 
+                  retail = w.mean(retail_recreation, weekday_weights), 
+                  grocery = w.mean(grocery_pharmacy, weekday_weights), 
+                  transit = w.mean(transit_stations, weekday_weights)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2, rep(0, length(date))), study)]
 another[, predictor := retail * 0.345 + transit * 0.445 + grocery * 0.210] # See "optimisation" below for how this was arrived at
 
