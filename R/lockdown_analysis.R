@@ -78,7 +78,7 @@ gm_w[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
 # Plot Wales google mobility data
 ggplot(gm_w) + 
     geom_line(aes(x = date, y = rollmean(value, k = 7, fill = "extend"), colour = variable)) +
-    geom_vline(aes(xintercept = ymd("2020-10-16"))) +
+    geom_vline(aes(xintercept = ymd("2020-10-23"))) +
     facet_wrap(~variable) +
     theme(legend.position = "none")
 
