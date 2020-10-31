@@ -113,7 +113,7 @@ contacts_clean = cpmerged[, .(
     date = date, 
     week = lubridate::week(date),
     weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE),
-    contacts = ifelse(is.na(cont_id) | suspected_non_contact == 1, 0, 1),
+    contacts = ifelse(is.na(cont_id) | suspected_non_contact == 1 | suspected_multiple_contact == 1, 0, 1),
     cont_id,
     cont_age_min,
     cont_age_max,
