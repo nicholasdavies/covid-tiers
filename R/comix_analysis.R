@@ -8,15 +8,14 @@ library(mgcv)
 library(qs)
 
 # LOAD COMIX AND GOOGLE MOBILITY
-participants = readRDS("../comix/data/clean_participants.rds")
-contacts = readRDS("../comix/data/clean_contacts.rds")
+participants = readRDS("~/Documents/uk_covid_data_sensitive/comix/data/clean_participants.rds")
+contacts = readRDS("~/Documents/uk_covid_data_sensitive/comix/data/clean_contacts.rds")
 gm = qread("./data/google_mobility_uk.qs")
 gm = gm[country_region_code == "GB" & sub_region_1 == ""]
 
 
 
 # CLEAN COMIX DATA
-
 map_minutes_min = c(
     "Less than 5 minutes" = 0,
     "5 minutes or more, but less than 15 minutes" = 5,
@@ -179,7 +178,6 @@ contacts_clean[contacts == 0, e_other_house := FALSE]
 
 
 # ANALYSIS BIT
-
 num = contacts_clean[, .(home = sum(d_home), work = sum(d_work), school = sum(d_school), other = sum(d_other), 
     e_home_non_hh = sum(e_home_non_hh), e_other_house = sum(e_other_house)), 
     by = .(part_id, part_age = part_age_min, date)]
