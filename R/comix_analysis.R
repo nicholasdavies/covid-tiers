@@ -81,7 +81,7 @@ parts = participants[, .(
     part_age, 
     part_age_group,
     part_gender
-    ), by = .(part_id, panel, wave, date)]
+    ), by = .(part_id, panel, wave, date, survey_date)]
 
 # Clean participant ages
 parts[, part_age_min := part_age]
