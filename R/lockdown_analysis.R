@@ -78,14 +78,14 @@ gm_w[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
 # Plot Wales google mobility data
 ggplot(gm_w) + 
     geom_line(aes(x = date, y = rollmean(value, k = 7, fill = "extend"), colour = variable)) +
-    geom_vline(aes(xintercept = ymd("2020-10-16"))) +
+    geom_vline(aes(xintercept = ymd("2020-10-23"))) +
     facet_wrap(~variable) +
     theme(legend.position = "none")
 
 # Compare post-lockdown values to pre-lockdown values (2 week lookback)
-compare = gm_w[date %between% c(ymd("2020-10-23", "2020-10-27")) & variable != "parks"]
+compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-27")) & variable != "parks"]
 compare = merge(compare,
-    gm_w[date %between% c(ymd("2020-10-23", "2020-10-27") - 7) & variable != "parks", 
+    gm_w[date %between% c(ymd("2020-10-24", "2020-10-27") - 7) & variable != "parks", 
         .(date = date + 7, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
@@ -93,12 +93,12 @@ compare[, change := value - baseline]
 compare[, mean(change), by = variable]
 
 # IMPACT OF LOCKDOWN FOR WALES:
-#                 variable         V1
-# 1:  grocery_and_pharmacy -16.086580
-# 2:           residential   5.699122
-# 3: retail_and_recreation -32.978788
-# 4:      transit_stations -17.884917
-# 5:            workplaces -18.981818
+# variable         V1
+# 1:  grocery_and_pharmacy -21.085498
+# 2:           residential   6.953449
+# 3: retail_and_recreation -41.640152
+# 4:      transit_stations -21.390237
+# 5:            workplaces -22.727273
 
 
 # Visual comparison
