@@ -13,6 +13,10 @@ contacts = readRDS("../comix/data/clean_contacts.rds")
 gm = qread("./data/google_mobility_uk.qs")
 gm = gm[country_region_code == "GB" & sub_region_1 == ""]
 
+# Ensure google and comix data are aligned
+participants <- participants[date <= max(gm$date)]
+contacts <- contacts[date <= max(gm$date)]
+gm <- gm[date <= max(participants$date)]
 
 
 # CLEAN COMIX DATA
@@ -101,6 +105,7 @@ contacts[cnt_age %like% "^[0-9]+-[0-9]+$", cont_age_max := as.numeric(str_replac
 
 # Merge contacts and participants
 cpmerged = merge(parts, contacts, by = c("part_id", "panel", "wave", "date"), all = TRUE)
+
 
 # Tidy data
 contacts_clean = cpmerged[, .(
@@ -221,6 +226,12 @@ pnum[, study := "POLYMOD"]
 
 num = rbind(num, pnum, fill = TRUE)
 
+## Add weekday weights
+num[weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE)]
+num[weekday_weights := ifelse(weekday %in% c("Saturday", "Sunday"), 2,5)]
+
+
+
 num[, retail_recreation := (100 + retail_recreation) * 0.01]
 num[, grocery_pharmacy  := (100 + grocery_pharmacy ) * 0.01]
 num[, parks             := (100 + parks            ) * 0.01]
@@ -308,7 +319,7 @@ another = num[, .(other = mean(other), other_house = mean(e_other_house, na.rm =
 
 another[, predictor := retail * 0.345 + transit * 0.445 + grocery * 0.210]
 
-#home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pre-pandemic", "pandemic"))]
+#home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pandemic", "pre-pandemic"))]
 
 ggplot(another) + 
     geom_point(aes(x = week, y = other, colour = study)) + 
