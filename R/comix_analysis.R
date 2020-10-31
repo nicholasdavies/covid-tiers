@@ -161,14 +161,16 @@ contacts_clean = contacts_clean[order(date, part_id, cont_id)]
 
 contacts_clean[, total_c  := sum(contacts), by = .(date, part_id)]
 contacts_clean[, d_home   := c_home == 1]
-contacts_clean[, d_school := c_school == 1 & c_home == 0]
-contacts_clean[, d_work   := c_work == 1   & c_home == 0   & c_school == 0]
-contacts_clean[, d_other  := contacts == 1 & c_home == 0   & c_school == 0 & c_work == 0]
+contacts_clean[, d_school := ifelse(part_age_max <= 18, c_school == 1 & c_home == 0, c_school == 1 & c_home == 0 & c_work == 0)]
+contacts_clean[, d_work := ifelse(part_age_min >= 18, c_work == 1 & c_home == 0, c_work == 1 & c_home == 0 & c_school == 0)]
+contacts_clean[, d_other  := contacts == 1 & c_home == 0 & c_school == 0 & c_work == 0]
 contacts_clean[, e_home_non_hh := d_home == 1 & hhm == FALSE]
 contacts_clean[, e_other_house := d_other == 1 & c_other_house == 1]
 contacts_clean[contacts == 0, d_home := FALSE]
 contacts_clean[contacts == 0, d_work := FALSE]
 contacts_clean[contacts == 0, d_school := FALSE]
+contacts_clean[contacts == 0, d_work18 := FALSE]
+contacts_clean[contacts == 0, d_school18 := FALSE]
 contacts_clean[contacts == 0, d_other := FALSE]
 contacts_clean[contacts == 0, e_home_non_hh := FALSE]
 contacts_clean[contacts == 0, e_other_house := FALSE]
@@ -196,9 +198,10 @@ poly_p = polymod$participants[country == "United Kingdom"]
 poly_c = polymod$contacts
 poly = merge(poly_p, poly_c, by = "part_id", all.x = TRUE);
 
+
 poly[, d_home   := cnt_home == 1]
-poly[, d_school := cnt_school == 1 & cnt_home == 0]
-poly[, d_work   := cnt_work == 1   & cnt_home == 0   & cnt_school == 0]
+poly[, d_school := ifelse(part_age < 18, cnt_school == 1 & cnt_home == 0, cnt_school == 1 & cnt_home == 0 & cnt_work == 0)]
+poly[, d_work   := ifelse(part_age >= 18, cnt_work == 1 & cnt_home == 0, cnt_work == 1 & cnt_home == 0 & cnt_school == 0)]
 poly[, d_other  := (cnt_transport + cnt_leisure + cnt_otherplace) >= 1 & cnt_home == 0 & cnt_school == 0 & cnt_work == 0]
 poly = poly[!is.na(d_home)] # only cuts out 6 contacts.
 
