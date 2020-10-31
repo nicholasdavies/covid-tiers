@@ -5,6 +5,7 @@ library(mgcv)
 library(lubridate)
 library(stringr)
 library(cowplot)
+library(qs)
 
 # Load Google Mobility data
 gm = qread("./data/google_mobility_uk.qs")
