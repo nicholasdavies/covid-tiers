@@ -227,10 +227,8 @@ pnum[, study := "POLYMOD"]
 num = rbind(num, pnum, fill = TRUE)
 
 ## Add weekday weights
-num[weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE)]
-num[weekday_weights := ifelse(weekday %in% c("Saturday", "Sunday"), 2,5)]
-
-
+num[,weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE)]
+num[,weekday_weights := ifelse(weekday %in% c("Saturday", "Sunday"), 2,5)]
 
 num[, retail_recreation := (100 + retail_recreation) * 0.01]
 num[, grocery_pharmacy  := (100 + grocery_pharmacy ) * 0.01]
@@ -260,8 +258,12 @@ asc = function(x, y0, y1, s0, s1)
     y0 + (y1 - y0) * h
 }
 
+## Weighted means accounting for weekdays. 
+wm <- function(x)   weighted.mean(x, weekday_weights)
+
+
 # *** Home model
-another = num[, .(home = mean(home), residential = mean(residential), transit = mean(transit_stations)), 
+another = num[, .(home = wm(home), residential = mean(residential), transit = mean(transit_stations)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2 * 2, rep(0, length(date))), study)]
 
 home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pandemic", "pre-pandemic"))]
