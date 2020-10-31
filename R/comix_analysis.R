@@ -110,9 +110,9 @@ contacts_clean = cpmerged[, .(
     part_gender = map_gender[part_gender],
     panel = str_remove(panel, "Panel "), 
     wave = as.numeric(str_remove(wave, "Wave ")), 
-    date = date - 1, # date is survey date, not contact date
-    week = lubridate::week(date - 1),
-    weekday = factor(lubridate::wday(date - 1, label = TRUE), ordered = FALSE),
+    date = date, 
+    week = lubridate::week(date),
+    weekday = factor(lubridate::wday(date, label = TRUE), ordered = FALSE),
     contacts = ifelse(is.na(cont_id) | suspected_non_contact == 1, 0, 1),
     cont_id,
     cont_age_min,
