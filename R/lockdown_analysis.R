@@ -83,9 +83,9 @@ ggplot(gm_w) +
     theme(legend.position = "none")
 
 # Compare post-lockdown values to pre-lockdown values (2 week lookback)
-compare = gm_w[date %between% c(ymd("2020-10-23", "2020-10-27")) & variable != "parks"]
+compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-27")) & variable != "parks"]
 compare = merge(compare,
-    gm_w[date %between% c(ymd("2020-10-23", "2020-10-27") - 7) & variable != "parks", 
+    gm_w[date %between% c(ymd("2020-10-24", "2020-10-27") - 7) & variable != "parks", 
         .(date = date + 7, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
