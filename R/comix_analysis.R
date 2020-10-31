@@ -253,7 +253,7 @@ asc = function(x, y0, y1, s0, s1)
 another = num[, .(home = mean(home), residential = mean(residential), transit = mean(transit_stations)), 
     by = .(week = ifelse(study == "CoMix", week(date) %/% 2 * 2, rep(0, length(date))), study)]
 
-home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pre-pandemic", "pandemic"))]
+home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pandemic", "pre-pandemic"))]
 
 days = data.table(x = 0:365)
 plh = ggplot(another) + 
