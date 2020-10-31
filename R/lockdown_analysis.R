@@ -93,12 +93,12 @@ compare[, change := value - baseline]
 compare[, mean(change), by = variable]
 
 # IMPACT OF LOCKDOWN FOR WALES:
-#                 variable         V1
-# 1:  grocery_and_pharmacy -16.086580
-# 2:           residential   5.699122
-# 3: retail_and_recreation -32.978788
-# 4:      transit_stations -17.884917
-# 5:            workplaces -18.981818
+# variable         V1
+# 1:  grocery_and_pharmacy -21.085498
+# 2:           residential   6.953449
+# 3: retail_and_recreation -41.640152
+# 4:      transit_stations -21.390237
+# 5:            workplaces -22.727273
 
 
 # Visual comparison
