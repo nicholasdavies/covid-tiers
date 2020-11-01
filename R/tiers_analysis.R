@@ -179,7 +179,7 @@ resultsD[, indic := str_replace_all(indic, "_", " ")]
 resultsD[, indic := str_to_sentence(indic)]
 resultsD[, indic := factor(indic)]
 
-theme_set(cowplot::theme_cowplot(font_size = 8) + theme(strip.background = element_blank()))
+theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
 
 # Start with GM trends
 ggplot(resultsD[indic != "Parks"]) +
