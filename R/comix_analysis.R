@@ -256,7 +256,7 @@ home_f = another[, mean(home), by = .(context = ifelse(study == "CoMix", "pandem
 days = data.table(x = 0:365)
 plh = ggplot(another) + 
     geom_point(aes(x = week, y = home, colour = study)) + 
-    geom_line(data = days, aes(x = x / 7, y = asc(x / 366, 3.875622, 1.545019, -79 * 0.6, 286 * 0.6))) +
+    geom_line(data = days, aes(x = x / 7, y = asc(x / 366, 3.891824, 1.535985, -79 * 0.6, 286 * 0.6))) +
     ylim(0, 4) + labs(x = "Week of 2020", y = "Home contacts", colour = "Study") +
     theme(legend.position = c(0.8, 0.8))
 
@@ -418,8 +418,10 @@ ggplot(pred) +
 
 
 # *** Plot
-cowplot::plot_grid(plh, pls, plw, plo, nrow = 2, align = "hv")
-ggsave("./figures/comix_analysis.png", width = 20, height = 15, units = "cm")
+theme_set(theme_cowplot(font_size = 8))
+cowplot::plot_grid(plh, pls, plw, plo, nrow = 2, align = "hv", labels = letters[1:4], label_size = 10)
+ggsave("./figures/comix_analysis.pdf", width = 18, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/comix_analysis.png", width = 18, height = 12, units = "cm")
 
 
 # OPTIMISING "other"
@@ -434,12 +436,9 @@ objective = function(x)
     if (sum(x) > 1 || any(x < 0)) {
         return (Inf)
     }
-    #model = gam(other ~ 0 + s(I(x[1] * retail + x[2] * grocery + x[3] * transit +
-    #                            x[4] * parks + x[5] * workplaces + (1 - sum(x)) * residential)), family = gaussian, data = another)
 
     model = gam(other ~ 0 + s(I(x[1] * retail + x[2] * grocery + (1 - sum(x)) * transit)), family = gaussian, data = another)
 
-    #model$aic
     -summary(model)$dev.expl
 }
 

@@ -223,19 +223,20 @@ ggsave("./figures/tiers_analysis_4.png", width = 25, height = 15, units = "cm")
 individual = resultsD[tier != "T 0", .(detrend = mean(detrend), baseline = mean(original), change = mean(detrend - baseline)), 
     by = .(full_region, sub_region_1, indic, tier)]
 summary = individual[, .(change = mean(change)), keyby = .(indic, tier)]
-summary[, T0 := first(change), by = indic]
-summary = summary[, .(change = change - T0), keyby = .(indic, tier)]
+summary[, T1 := first(change), by = indic]
+summary = summary[, .(change = change - T1), keyby = .(indic, tier)]
 summary
 
-ggplot(individual[indic != "Parks"]) +
+ggplot(individual) +
     geom_violin(aes(x = tier, y = change, fill = as.factor(tier)), alpha = 0.25, colour = NA) +
     geom_jitter(aes(x = tier, y = change, colour = as.factor(tier)), width = 0.4, height = 0, size = 0.75) +
-    geom_label(data = summary[indic != "Parks"], aes(x = tier, y = change, label = round(change, 2)), alpha = 0.75) +
+    geom_label(data = summary, aes(x = tier, y = change, label = round(change, 2)), alpha = 0.75) +
     facet_wrap(~indic, scales = "free") +
     scale_colour_manual(values = c("#4499cc", "#ee99ee", "#ee4433"), aesthetics = c("colour", "fill")) +
-    theme(legend.position = c(0.8, 0.2)) +
+    theme(legend.position = "none") +
     labs(x = "Tier", y = "Change in Google Mobility index", fill = "Tier", colour = "Tier")
-ggsave("./figures/tiers_analysis_5.png", width = 25, height = 15, units = "cm")
+ggsave("./figures/tiers_analysis.pdf", width = 18, height = 10, units = "cm", useDingbats = F)
+ggsave("./figures/tiers_analysis.png", width = 18, height = 10, units = "cm")
 
 # Is there a change over time?
 bytime = resultsD[tier != "T 0", .(detrend = detrend, baseline = mean(baseline), change = detrend - mean(baseline)), 

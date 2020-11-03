@@ -1,6 +1,7 @@
 .DS_Store
 figures/*
 *.Rproj
+fit*.qs
 
 # History files
 .Rhistory

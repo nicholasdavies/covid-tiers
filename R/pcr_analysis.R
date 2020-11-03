@@ -4,9 +4,12 @@ library(ggplot2)
 library(data.table)
 library(mcmc)
 library(sn)
+library(stringr)
 
-pos_curve = fread("~/Downloads/pos_curve__1_.csv")
+# PCR positivity over time curve: from Tim 
+pos_curve = fread("./data/pos_curve__1_.csv")
 
+# Solve skew-normal distribution with 95% CI and median
 solve_sn = function(lower, median, upper)
 {
     objective = function(x) { 
@@ -24,7 +27,13 @@ for (i in 1:nrow(pos_curve)) {
     pos_curve[i, p3 := ans$par[3]]
 }
 
-
+# Positivity function for integration.
+# Assumes time to conversion is gamma distributed with mean mean_conv and shape shape_conv,
+# and time from conversion to reversion is gamma distributed with mean mean_wane and shape shape_wane.
+# Then the probability that an individual tests positive at time x days after infection is
+#    integral from 0 to x ( dgamma(y | mean_conv, shape_conv) * (1 - pgamma(x - y | mean_wane, shape_wane)) dy
+# Above, the first term is the probability that the invididual has converted at time y < x and the second
+# term is the probability that they have not reverted by time x.
 positive = function(y, x, mean_conv, shape_conv, mean_wane, shape_wane)
 {
     rate_conv = shape_conv / mean_conv
@@ -76,7 +85,6 @@ ans
 #         Waning ~ gamma(mean = 8.77, shape = 1.52)
 
 
-
 # Approach 2: Posterior mean with MCMC
 posterior = function(x) {
     mean_conv = x[1]
@@ -100,7 +108,7 @@ posterior = function(x) {
     return (d[2:.N, sum(ll)])
 }
 
-# Initial exploration
+# Initial exploration via MCMC
 set.seed(42)
 x_init = c(1, 1, 1, 1)
 out = metrop(posterior, x_init, 1e3)
@@ -109,7 +117,7 @@ out$accept
 
 # Rerunning -- scale found by experimenting...
 out = metrop(out, scale = c(0.4, 1, 0.25, 0.25) * 0.7, nbatch = 1e4)
-out$accept # 0.28 - good
+out$accept # 0.28 acceptance rate - good
 
 # Results
 d = as.data.table(out$batch)
@@ -121,20 +129,87 @@ ggplot(d) +
     geom_line(aes(x = trial, y = V3, colour = "V3")) +
     geom_line(aes(x = trial, y = V4, colour = "V4"))
 d = d[trial > 3000]
+# Looks like decent mixing.
 
-
+# Examine posterior distributions
 ggplot(d) + geom_histogram(aes(x = V1))
 ggplot(d) + geom_histogram(aes(x = V2))
 ggplot(d) + geom_histogram(aes(x = V3))
 ggplot(d) + geom_histogram(aes(x = V4))
 
+# Get posterior means
 d[, mean(V1)]
 d[, mean(V2)]
 d[, mean(V3)]
 d[, mean(V4)]
 
+# > d[, mean(V1)]
+# [1] 2.76385
+# > d[, mean(V2)]
+# [1] 4.787206
+# > d[, mean(V3)]
+# [1] 8.470949
+# > d[, mean(V4)]
+# [1] 1.960072
 
 
+# Figure for supplement.
+library(cowplot)
+
+theme_set(theme_cowplot(font_size = 8))
+
+# use thinned posterior
+d0 = d[seq(1, .N, by = 10)]
+
+# return a single PCR positivity curve using parameters x
+trace = function(x) {
+    mean_conv = x[1]
+    shape_conv = x[2]
+    mean_wane = x[3]
+    shape_wane = x[4]
+    
+    d = data.table(t = 0:30, pos = 0)
+    for (i in 2:nrow(d)) {
+        d[i, pos := integrate(positive, 0, t, x = t, 
+            mean_conv = mean_conv, shape_conv = shape_conv, mean_wane = mean_wane, shape_wane = shape_wane)[[1]]]
+    }
+
+    return (d)
+}
+
+# Get posterior distribution of curves
+for (i in 1:nrow(d0)) {
+    tr = trace(d0[i, c(V1, V2, V3, V4)])
+    d0[i, paste0("t", 0:30) := as.list(tr$pos)]
+}
+
+# Calculate quantiles
+d1 = melt(d0[, .SD, .SDcols = -(1:4)], id.vars = "trial", variable.name = "time")
+d1[, time := as.numeric(str_remove_all(time, "t"))]
+d1 = d1[, as.list(quantile(value, c(0.025, 0.5, 0.975))), by = time]
+
+pl_pos = ggplot() +
+    geom_ribbon(data = d1, aes(x = time, ymin = `2.5%`, ymax = `97.5%`), fill = "#88eeee") +
+    geom_line(data = d1, aes(x = time, y = `50%`), colour = "#449999") +
+    geom_pointrange(data = pos_curve, aes(x = days_since_infection, y = median, ymin = lower, ymax = upper), fatten = 0.2) +
+    labs(x = "Days since infection", y = "Probability of positive PCR test")
+
+# Histograms for values
+d2 = melt(d, id.vars = "trial")
+d2[variable == "V1", variable := "(i) Days from infection\nto positivity"]
+d2[variable == "V2", variable := "(ii) Shape parameter of\ngamma distribution for (i)"]
+d2[variable == "V3", variable := "(iii) Days from positivity\nto loss of positivity"]
+d2[variable == "V4", variable := "(iv) Shape parameter of\ngamma distribution for (iii)"]
+d2[, variable := factor(variable, unique(variable))]
+
+pl_hist = ggplot(d2) +
+    geom_histogram(aes(x = value, y = after_stat(density), fill = variable), bins = 20) +
+    facet_wrap(~variable, scales = "free") +
+    theme(strip.background = element_blank(), legend.position = "none") +
+    labs(x = "Value", y = "Posterior density")
 
 
+pl = plot_grid(pl_pos, pl_hist, nrow = 1, labels = letters[1:2], label_size = 10)
+ggsave("./figures/pcr_analysis.pdf", plot = pl, width = 18, height = 8, units = "cm", useDingbats = FALSE)
+ggsave("./figures/pcr_analysis.png", plot = pl, width = 18, height = 8, units = "cm")
 

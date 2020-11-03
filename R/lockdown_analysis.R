@@ -7,6 +7,8 @@ library(stringr)
 library(cowplot)
 library(qs)
 
+theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
+
 # Load Google Mobility data
 gm = qread("./data/google_mobility_uk.qs")
 
@@ -44,14 +46,19 @@ ggplot(gm_ni) +
     theme(legend.position = "none")
 
 # Compare post-lockdown values to pre-lockdown values (2 week lookback)
-compare = gm_ni[date %between% c(ymd("2020-10-17", "2020-10-27")) & variable != "parks"]
+compare = gm_ni[date %between% c(ymd("2020-10-17", "2020-10-27"))]
 compare = merge(compare,
-    gm_ni[date %between% c(ymd("2020-10-17", "2020-10-27") - 14) & variable != "parks", 
+    gm_ni[date %between% c(ymd("2020-10-17", "2020-10-27") - 14), 
         .(date = date + 14, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
 compare[, change := value - baseline]
 compare[, mean(change), by = variable]
+compare[, variable := str_replace_all(variable, "_", " ")]
+compare[, variable := str_to_sentence(variable)]
+compare[, variable := factor(variable)]
+
+summary = compare[, mean(change), by = variable]
 
 # IMPACT OF LOCKDOWN FOR NORTHERN IRELAND:
 #                 variable          V1
@@ -62,10 +69,14 @@ compare[, mean(change), by = variable]
 # 5:            workplaces -13.3636364
 
 # Visual comparison
-ggplot(compare) +
+pl_ni = ggplot(compare) +
+    geom_hline(aes(yintercept = 0), linetype = "23") + 
     geom_point(aes(x = date, y = change)) + 
     geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
-    facet_wrap(~variable)
+    geom_label(data = summary, aes(x = ymd("2020-10-22"), y = 45, 
+        label = paste0(ifelse(V1 > 0, "+", ""), round(V1, 2))), alpha = 0.75) +
+    facet_wrap(~variable) +
+    labs(x = "Date", y = "Change in Google Mobility index")
 
 
 
@@ -85,14 +96,20 @@ ggplot(gm_w) +
     theme(legend.position = "none")
 
 # Compare post-lockdown values to pre-lockdown values (1 week lookback)
-compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-27")) & variable != "parks"]
+compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-27"))]
 compare = merge(compare,
-    gm_w[date %between% c(ymd("2020-10-24", "2020-10-27") - 7) & variable != "parks", 
+    gm_w[date %between% c(ymd("2020-10-24", "2020-10-27") - 7), 
         .(date = date + 7, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
 compare[, change := value - baseline]
 compare[, mean(change), by = variable]
+compare[, variable := str_replace_all(variable, "_", " ")]
+compare[, variable := str_to_sentence(variable)]
+compare[, variable := factor(variable)]
+
+summary = compare[, mean(change), by = variable]
+
 
 # IMPACT OF LOCKDOWN FOR WALES:
 # variable         V1
@@ -104,10 +121,20 @@ compare[, mean(change), by = variable]
 
 
 # Visual comparison
-ggplot(compare) +
+pl_w = ggplot(compare) +
+    geom_hline(aes(yintercept = 0), linetype = "23") + 
     geom_point(aes(x = date, y = change)) + 
     geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
-    facet_wrap(~variable)
+    geom_label(data = summary, aes(x = ymd("2020-10-25") + 0.5, y = -10, 
+        label = paste0(ifelse(V1 > 0, "+", ""), round(V1, 2))), alpha = 0.75) +
+    facet_wrap(~variable) +
+    labs(x = "Date", y = "Change in Google Mobility index")
+
+cowplot::plot_grid(pl_ni, pl_w, nrow = 2, labels = letters[1:2], label_size = 10)
+
+ggsave("./figures/lockdown_analysis.pdf", width = 18, height = 18, units = "cm", useDingbats = F)
+ggsave("./figures/lockdown_analysis.png", width = 18, height = 18, units = "cm")
+
 
 
 
