@@ -246,6 +246,13 @@ asc = function(x, y0, y1, s0, s1)
     h = (exp(xx) / (1 + exp(xx)) - h0) / (h1 - h0)
     y0 + (y1 - y0) * h
 }
+another = num[, .(total = mean(home + work + school + other, na.rm = T)), 
+    by = .(week = ifelse(study == "CoMix", as.Date(ymd("2020-01-01") + 7 * (week(date) %/% 2 * 2)), rep(as.Date(NA), length(date))), study)]
+
+ggplot(another) +
+    geom_point(aes(x = ymd("1900-01-01") + week, y = total)) +
+    scale_x_date(date_breaks = "1 month", date_label = "%b") +
+    ylim(0, 7)
 
 # *** Home model
 another = num[, .(home = mean(home), residential = mean(residential), transit = mean(transit_stations)), 

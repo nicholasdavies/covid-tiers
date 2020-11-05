@@ -2,6 +2,7 @@
 figures/*
 *.Rproj
 fit*.qs
+mtp*.qs
 
 # History files
 .Rhistory

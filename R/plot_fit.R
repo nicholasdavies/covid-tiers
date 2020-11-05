@@ -82,7 +82,7 @@ sero = all_data[[4]]
 
 
 # SUMMARISING FUNCS
-SPIM_output_1var = function(summ, varname, outname, cyear, cmonth, cday, ymd_from, ymd_to)
+output_1var = function(summ, varname, outname, cyear, cmonth, cday, ymd_from, ymd_to)
 {
     quants = c(0.025, 0.5, 0.975)
 
@@ -105,7 +105,7 @@ SPIM_output_1var = function(summ, varname, outname, cyear, cmonth, cday, ymd_fro
     data_out
 }
 
-SPIM_output_full = function(test, cyear, cmonth, cday, ymd_from, ymd_to)
+output_full = function(test, cyear, cmonth, cday, ymd_from, ymd_to)
 {
     cat("Summarizing variables...\n");
     summ = test[, .(death_o = sum(death_o)), by = .(run, t, population)]
@@ -114,15 +114,18 @@ SPIM_output_full = function(test, cyear, cmonth, cday, ymd_from, ymd_to)
     summ34 = test[, .(admissions = sum(hosp_undetected_o)), by = .(run, t, population)]
     summ_pcr_p = test[, .(pcr_p = sum(pcr_positive_p)), by = .(run, t, population)]
     summ_sero_p = test[, .(sero_p = sum(lfia_positive_p)), by = .(run, t, population)]
+    summ_attackrate = test[, .(attackrate = sum(pcr_positive_i)), by = .(run, t, population)]
+    summ_attackrate[, attackrate := cumsum(attackrate), by = .(run, population)]
 
     cat("Running quantiles...\n");
     w = rbind(
-        SPIM_output_1var(summ, "death_o", "type28_death_inc_line", cyear, cmonth, cday, ymd_from, ymd_to),
-        SPIM_output_1var(summ3, "icu_p", "icu_prev", cyear, cmonth, cday, ymd_from, ymd_to),
-        SPIM_output_1var(summ4, "bed_p", "hospital_prev", cyear, cmonth, cday, ymd_from, ymd_to),
-        SPIM_output_1var(summ34, "admissions", "hospital_inc", cyear, cmonth, cday, ymd_from, ymd_to),
-        SPIM_output_1var(summ_pcr_p, "pcr_p", "pcr_prev", cyear, cmonth, cday, ymd_from, ymd_to),
-        SPIM_output_1var(summ_sero_p, "sero_p", "sero_prev", cyear, cmonth, cday, ymd_from, ymd_to)
+        output_1var(summ, "death_o", "type28_death_inc_line", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ3, "icu_p", "icu_prev", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ4, "bed_p", "hospital_prev", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ34, "admissions", "hospital_inc", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ_pcr_p, "pcr_p", "pcr_prev", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ_sero_p, "sero_p", "sero_prev", cyear, cmonth, cday, ymd_from, ymd_to),
+        output_1var(summ_attackrate, "attackrate", "attackrate", cyear, cmonth, cday, ymd_from, ymd_to)
     )
     return (w)
 }
@@ -158,7 +161,7 @@ make_data = function(ld, sitreps, virus, sero)
 # parametersI = saved[[3]]
 # rm(saved)
 
-saved = qread("./fit_pp3.qs")
+saved = qread("./fit_pp15.qs")
 posteriorsI = saved[[1]]
 parametersI = saved[[2]]
 rm(saved)
@@ -365,8 +368,6 @@ for (p in c(1,3,4,5,6,9,10))  {
 lapply(posteriorsI, function(x) list(maxlp = max(x$lp), meanlp = mean(x$lp)))
 
 
-
-
 #
 # PLOT FITS.
 #
@@ -389,32 +390,61 @@ for (i in seq_along(parametersI)) {
 # Create formatted output
 test = rbindlist(dynamicsI, fill = TRUE)
 test[, population := nhs_regions[population]]
-output = SPIM_output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-10-23")
+output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-10-23")
 output[, d := make_date(`Year of Value`, `Month of Value`, `Day of Value`)]
+output = merge(output, popsize, by = "Geography")
+
+adj_output = function(output, val_type, div, pop = 0) {
+    output[ValueType == val_type, Value := Value / (div + population_size * pop)]
+    output[ValueType == val_type, `Quantile 0.025` := `Quantile 0.025` / (div + population_size * pop)]
+    output[ValueType == val_type, `Quantile 0.5`   := `Quantile 0.5`   / (div + population_size * pop)]
+    output[ValueType == val_type, `Quantile 0.975` := `Quantile 0.975` / (div + population_size * pop)]
+}
+
+adj_output(output, "hospital_inc", 1)
+adj_output(output, "hospital_prev", 1)
+adj_output(output, "icu_prev", 1)
+adj_output(output, "pcr_prev", 0, 0.01)
+adj_output(output, "sero_prev", 0, 0.01)
+adj_output(output, "type28_death_inc_line", 1)
+adj_output(output, "attackrate", 0, 0.01)
 
 # Make data to output
 data = make_data(ld, sitreps, virus, sero)[!Geography %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")]
 data = merge(data, popsize, by = "Geography")
-data[ValueType %in% c("pcr_prev", "sero_prev"), ymin := ymin * population_size]
-data[ValueType %in% c("pcr_prev", "sero_prev"), y    := y    * population_size]
-data[ValueType %in% c("pcr_prev", "sero_prev"), ymax := ymax * population_size]
+
+adj_data = function(data, val_type, div, pop = 0) {
+    data[ValueType == val_type, ymin := ymin / (div + population_size * pop)]
+    data[ValueType == val_type, y    := y    / (div + population_size * pop)]
+    data[ValueType == val_type, ymax := ymax / (div + population_size * pop)]
+}
+
+adj_data(data, "hospital_inc", 1)
+adj_data(data, "hospital_prev", 1)
+adj_data(data, "icu_prev", 1)
+adj_data(data, "pcr_prev", 0.01)
+adj_data(data, "sero_prev", 0.01)
+adj_data(data, "type28_death_inc_line", 1)
 
 # Relabel outcomes
 output[ValueType == "hospital_inc", ValueType := "Admissions"]
-output[ValueType == "hospital_prev", ValueType := "Hospital beds"]
-output[ValueType == "icu_prev", ValueType := "ICU beds"]
-output[ValueType == "pcr_prev", ValueType := "PCR positives"]
-output[ValueType == "sero_prev", ValueType := "Seropositives"]
-output[ValueType == "type28_death_inc_line", ValueType := "Deaths (28 d)"]
-output[, ValueType := factor(ValueType, levels = c("Deaths (28 d)", "Admissions", "Hospital beds", "ICU beds", "PCR positives", "Seropositives"))]
+output[ValueType == "hospital_prev", ValueType := "Hosp beds occupied"]
+output[ValueType == "icu_prev", ValueType := "ICU beds occupied"]
+output[ValueType == "pcr_prev", ValueType := "PCR positivity, %"]
+output[ValueType == "sero_prev", ValueType := "Seropositivity, %"]
+output[ValueType == "type28_death_inc_line", ValueType := "Deaths"]
+output[ValueType == "attackrate", ValueType := "Attack rate, %"]
+output[, ValueType := factor(ValueType, levels = c("Deaths", "Admissions", "Hosp beds occupied", 
+    "ICU beds occupied", "PCR positivity, %", "Seropositivity, %", "Attack rate, %"))]
 
 data[ValueType == "hospital_inc", ValueType := "Admissions"]
-data[ValueType == "hospital_prev", ValueType := "Hospital beds"]
-data[ValueType == "icu_prev", ValueType := "ICU beds"]
-data[ValueType == "pcr_prev", ValueType := "PCR positives"]
-data[ValueType == "sero_prev", ValueType := "Seropositives"]
-data[ValueType == "type28_death_inc_line", ValueType := "Deaths (28 d)"]
-data[, ValueType := factor(ValueType, levels = c("Deaths (28 d)", "Admissions", "Hospital beds", "ICU beds", "PCR positives", "Seropositives"))]
+data[ValueType == "hospital_prev", ValueType := "Hosp beds occupied"]
+data[ValueType == "icu_prev", ValueType := "ICU beds occupied"]
+data[ValueType == "pcr_prev", ValueType := "PCR positivity, %"]
+data[ValueType == "sero_prev", ValueType := "Seropositivity, %"]
+data[ValueType == "type28_death_inc_line", ValueType := "Deaths"]
+data[, ValueType := factor(ValueType, levels = c("Deaths", "Admissions", "Hosp beds occupied", 
+    "ICU beds occupied", "PCR positivity, %", "Seropositivity, %", "Attack rate, %"))]
 
 # Make plot
 theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
@@ -447,36 +477,35 @@ theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = elem
 # ggsave("./figures/fits2.pdf", width = 18, height = 16, units = "cm", useDingbats = F)
 # ggsave("./figures/fits2.png", width = 18, height = 16, units = "cm")
 
-linetypes = c("Deaths (28 d)", "Admissions", "Hospital beds", "ICU beds")
+linetypes = c("Deaths", "Admissions", "Hosp beds occupied", "ICU beds occupied")
 
 ggplot(output[d > "2020-03-01"]) +
-    geom_ribbon(aes(x = d, ymin = `Quantile 0.025` / 1000, ymax = `Quantile 0.975` / 1000, fill = ValueType), alpha = 0.5) +
-    geom_line(aes(x = d, y = Value / 1000, colour = ValueType)) +
-    geom_line(data = data[ValueType %in% linetypes], aes(x = d, y = y / 1000), size = 0.2) +
-    geom_point(data = data[!ValueType %in% linetypes], aes(x = d, y = y / 1000), size = 0.01, shape = 20) +
-    geom_linerange(data = data, aes(x = d, ymin = ymin / 1000, ymax = ymax / 1000), size = 0.2) +
-    geom_linerange(data = data, aes(xmin = dmin, xmax = dmax, y = y / 1000), size = 0.2) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`, fill = ValueType), alpha = 0.5) +
+    geom_line(aes(x = d, y = Value, colour = ValueType)) +
+    geom_line(data = data[ValueType %in% linetypes], aes(x = d, y = y), size = 0.2) +
+    geom_point(data = data[!ValueType %in% linetypes], aes(x = d, y = y), size = 0.01, shape = 20) +
+    geom_linerange(data = data, aes(x = d, ymin = ymin, ymax = ymax), size = 0.2) +
+    geom_linerange(data = data, aes(xmin = dmin, xmax = dmax, y = y), size = 0.2) +
     facet_grid(ValueType ~ Geography, scales = "free", switch = "y") +
     theme_cowplot(font_size = 6) +
     theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
-    labs(x = "Date", y = "Value (thousands)")
+    labs(x = NULL, y = NULL)
 
-ggsave("./figures/fits.pdf", width = 18, height = 9, units = "cm", useDingbats = F)
-ggsave("./figures/fits.png", width = 18, height = 9, units = "cm")
+ggsave("./figures/fits.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
+ggsave("./figures/fits.png", width = 18, height = 14, units = "cm")
 
-# Zoomed in version of infection prevalence
-ggplot(output[d > "2020-04-15" & ValueType == "PCR positives"]) +
-    geom_ribbon(aes(x = d, ymin = `Quantile 0.025` / 1000, ymax = `Quantile 0.975` / 1000, fill = ValueType), alpha = 0.5) +
-    geom_line(aes(x = d, y = Value / 1000, colour = ValueType)) +
-    geom_line(data = data[ValueType %in% linetypes & ValueType == "PCR positives"], aes(x = d, y = y / 1000), size = 0.2) +
-    geom_point(data = data[!ValueType %in% linetypes & ValueType == "PCR positives"], aes(x = d, y = y / 1000), size = 0.01, shape = 20) +
-    geom_linerange(data = data[ValueType == "PCR positives"], aes(x = d, ymin = ymin / 1000, ymax = ymax / 1000), size = 0.2) +
-    geom_linerange(data = data[ValueType == "PCR positives"], aes(xmin = dmin, xmax = dmax, y = y / 1000), size = 0.2) +
+ggplot(output[d > "2020-04-15" & ValueType == "PCR positivity, %"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`), fill = "#6F9AF8", alpha = 0.5) +
+    geom_line(aes(x = d, y = Value), colour = "#6F9AF8") +
+    geom_line(data = data[ValueType %in% linetypes & ValueType == "PCR positivity, %"], aes(x = d, y = y), size = 0.2) +
+    geom_point(data = data[!ValueType %in% linetypes & ValueType == "PCR positivity, %"], aes(x = d, y = y), size = 0.01, shape = 20) +
+    geom_linerange(data = data[ValueType == "PCR positivity, %"], aes(x = d, ymin = ymin, ymax = ymax), size = 0.2) +
+    geom_linerange(data = data[ValueType == "PCR positivity, %"], aes(xmin = dmin, xmax = dmax, y = y), size = 0.2) +
     facet_wrap(~Geography, scales = "free", nrow = 2) +
     scale_x_date(date_breaks = "1 month", date_labels = "%b") +
     theme_cowplot(font_size = 6) +
     theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
-    labs(x = "Date", y = "Value (thousands)")
+    labs(x = NULL, y = "PCR positivity, %")
 
 ggsave("./figures/prevalence.pdf", width = 18, height = 8, units = "cm", useDingbats = F)
 ggsave("./figures/prevalence.png", width = 18, height = 8, units = "cm")
