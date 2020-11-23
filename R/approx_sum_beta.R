@@ -114,3 +114,21 @@ ggplot(test_data) +
     geom_freqpoly(aes(true, colour = "true")) +
     geom_freqpoly(aes(approx1, colour = "approx1")) +
     geom_freqpoly(aes(approx2, colour = "approx2"))
+
+
+
+# approximating the sum of two gamma variables
+shmanipulate({
+    A = (alpha1/beta1 + alpha2/beta2)^2 / (alpha1/beta1^2 + alpha2/beta2^2)
+    B = (alpha1/beta1 + alpha2/beta2) / (alpha1/beta1^2 + alpha2/beta2^2)
+
+    illust = data.table(x = seq(0, 10 * A/B, by = 0.01 * A/B))
+    illust[, approx := dgamma(x, shape = A, rate = B)]
+
+    rs = data.table(x = rgamma(100000, shape = alpha1, rate = beta1) + rgamma(100000, shape = alpha2, rate = beta2))
+    
+    ggplot(illust) +
+        geom_histogram(data = rs, aes(x = x, y = after_stat(density))) +
+        geom_line(aes(x, approx, colour = "approx"))
+
+}, alpha1 = c(0, 10), beta1 = c(0, 10), alpha2 = c(0, 10), beta2 = c(0, 10))

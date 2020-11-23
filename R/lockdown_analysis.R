@@ -101,11 +101,11 @@ pl_w_mob = ggplot(gm_w) +
     theme(legend.position = "none") +
     labs(x = "Date", y = "Rolling mean - Wales")
 
-# Compare post-lockdown values to pre-lockdown values (1 week lookback)
-compare = gm_w[date %between% c(ymd("2020-10-24", "2020-10-30"))]
+# Compare post-lockdown values to pre-lockdown values (2 week lookback)
+compare = gm_w[date %between% c(ymd("2020-10-24", "2020-11-06"))]
 compare = merge(compare,
-    gm_w[date %between% c(ymd("2020-10-24", "2020-10-30") - 7), 
-        .(date = date + 7, variable, baseline = value)],
+    gm_w[date %between% c(ymd("2020-10-24", "2020-11-06") - 14), 
+        .(date = date + 14, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
 compare[, change := value - baseline]
@@ -187,3 +187,63 @@ ggplot(compare) +
     geom_point(aes(x = date, y = change)) + 
     geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
     facet_wrap(~variable)
+
+
+
+
+# NEW ADDITION 16 Nov 2020: England
+# England
+iso3166 = fread("./data/county_iso3166_2_gb.csv")
+
+en_iso3166 = iso3166[gss_code %like% "^E", unique(iso_code)];
+gm_e = gm[iso_3166_2_code %in% en_iso3166, lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = 9:14, by = .(date)]
+gm_e = melt(gm_e, id.vars = "date")
+gm_e[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
+gm_e[, rollval := rollmean(value, k = 7, fill = "extend"), by = variable]
+
+
+# Plot England google mobility data
+pl_e_mob = ggplot(gm_e) + 
+    geom_line(aes(x = date, y = value, colour = variable)) +
+    geom_vline(aes(xintercept = ymd("2020-11-05")), linetype = "22", size = 0.3) +
+    facet_wrap(~variable) +
+    theme(legend.position = "none") +
+    labs(x = "Date", y = "Rolling mean - England")
+
+# Compare post-lockdown values to pre-lockdown values (2 week lookback)
+compare = gm_e[date %between% c(ymd("2020-11-05", "2020-11-13"))]
+compare = merge(compare,
+    gm_e[date %between% c(ymd("2020-11-05", "2020-11-13") - 21), 
+        .(date = date + 21, variable, baseline = value)],
+    by = c("date", "variable"))
+compare = compare[order(date, variable)]
+compare[, change := value - baseline]
+compare[, mean(change), by = variable]
+compare[, variable := str_replace_all(variable, "_", " ")]
+compare[, variable := str_to_sentence(variable)]
+compare[, variable := factor(variable)]
+
+summary = compare[, mean(change), by = variable]
+
+
+# IMPACT OF LOCKDOWN FOR ENGLAND:
+#                 variable         V1
+
+# Visual comparison
+pl_e = ggplot(compare) +
+    geom_hline(aes(yintercept = 0), linetype = "23") + 
+    geom_point(aes(x = date, y = change)) + 
+    geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
+    geom_label(data = summary, aes(x = ymd("2020-11-07") + 0.5, y = -10, 
+        label = paste0(ifelse(V1 > 0, "+", ""), round(V1, 2))), alpha = 0.75) +
+    facet_wrap(~variable) +
+    labs(x = "Date", y = "Change in Google Mobility index")
+
+cowplot::plot_grid(pl_ni_mob, pl_ni, pl_w_mob, pl_w, nrow = 2, labels = letters, label_size = 10)
+ggsave("./figures/lockdown_analysis_2.png", width = 24, height = 18, units = "cm")
+ggsave("./figures/lockdown_analysis_2.pdf", width = 24, height = 18, units = "cm", useDingbats = F)
+
+
+summ_all = cbind(summaryN, summaryW[, 2], summary[, 2])
+names(summ_all) = c("Indicator", "NI change", "Wales change", "England change")
+summ_all

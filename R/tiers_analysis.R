@@ -145,9 +145,6 @@ for (reg in regions) {
     }
 }
 
-### Remove weekday effect (the old-fashioned way)
-#results[, unweekday2 := rollmean(original, k = 7, fill = "extend"), by = .(sub_region_1, sub_region_2, indicator)]
-
 # Remove national trend from trendlines
 for (ind in indicators) {
     cat(".")
@@ -230,6 +227,7 @@ summary
 ggplot(individual) +
     geom_violin(aes(x = tier, y = change, fill = as.factor(tier)), alpha = 0.25, colour = NA) +
     geom_jitter(aes(x = tier, y = change, colour = as.factor(tier)), width = 0.4, height = 0, size = 0.75) +
+    geom_violin(aes(x = tier, y = change), colour = "#000000", size = 0.3, fill = NA) +
     geom_label(data = summary, aes(x = tier, y = change, label = round(change, 2)), alpha = 0.75) +
     facet_wrap(~indic, scales = "free") +
     scale_colour_manual(values = c("#4499cc", "#ee99ee", "#ee4433"), aesthetics = c("colour", "fill")) +

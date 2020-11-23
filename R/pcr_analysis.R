@@ -7,6 +7,12 @@ library(sn)
 library(stringr)
 
 # PCR positivity over time curve: from Tim 
+# Expected format: columns lower, upper, median, and days_since_infection
+# Ex. 
+# median lower upper days_since_infection
+# 0.1	 0.05  0.15  0
+# 0.2    0.1   0.3   1
+# ... (column order should not matter)
 pos_curve = fread("./data/pos_curve__1_.csv")
 
 # Solve skew-normal distribution with 95% CI and median
@@ -43,7 +49,7 @@ positive = function(y, x, mean_conv, shape_conv, mean_wane, shape_wane)
 
 # Exploratory analysis
 shmanipulate({
-    dt = data.table(t = 0:30)
+    dt = data.table(t = setdiff(pos_curve$days_since_infection, 0), pos = 0)
     for (i in 1:nrow(dt)) {
         dt[i, pos := integrate(positive, 0, t, x = t, 
             mean_conv = conv, shape_conv = shape_conv, mean_wane = wane, shape_wane = shape_wane)[[1]]]
@@ -68,8 +74,8 @@ objective = function(x) {
         return (10000)
     }
     
-    d = data.table(t = 0:30, pos = 0)
-    for (i in 2:nrow(d)) {
+    d = data.table(t = setdiff(pos_curve$days_since_infection, 0), pos = 0)
+    for (i in 1:nrow(d)) {
         d[i, pos := integrate(positive, 0, t, x = t, 
             mean_conv = mean_conv, shape_conv = shape_conv, mean_wane = mean_wane, shape_wane = shape_wane)[[1]]]
     }
@@ -81,8 +87,8 @@ objective = function(x) {
 
 ans = optim(c(1, 1, 1, 1), objective, method = "Nelder-Mead", control = list(trace = 5, maxit = 1000))
 ans
-# Result: Conversion ~ gamma(mean = 2.64, shape = 6.07)
-#         Waning ~ gamma(mean = 8.77, shape = 1.52)
+# Result: Conversion ~ gamma(mean = 2.64 [= ans$par[1]], shape = 6.07 [= ans$par[2]])
+#         Waning ~ gamma(mean = 8.77 [= ans$par[3]], shape = 1.52 [= ans$par[4]])
 
 
 # Approach 2: Posterior mean with MCMC
@@ -96,8 +102,8 @@ posterior = function(x) {
         return (-1e12)
     }
     
-    d = data.table(t = 0:30, pos = 0)
-    for (i in 2:nrow(d)) {
+    d = data.table(t = setdiff(pos_curve$days_since_infection, 0), pos = 0)
+    for (i in 1:nrow(d)) {
         d[i, pos := integrate(positive, 0, t, x = t, 
             mean_conv = mean_conv, shape_conv = shape_conv, mean_wane = mean_wane, shape_wane = shape_wane)[[1]]]
     }
@@ -128,7 +134,7 @@ ggplot(d) +
     geom_line(aes(x = trial, y = V2, colour = "V2")) +
     geom_line(aes(x = trial, y = V3, colour = "V3")) +
     geom_line(aes(x = trial, y = V4, colour = "V4"))
-d = d[trial > 3000]
+d = d[trial > 5000]
 # Looks like decent mixing.
 
 # Examine posterior distributions

@@ -3,6 +3,7 @@ figures/*
 *.Rproj
 fit*.qs
 mtp*.qs
+submission/
 
 # History files
 .Rhistory

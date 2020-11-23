@@ -33,46 +33,46 @@ source("~/Documents/covidm_MTPs/spim_output.R");
 
 nhs_regions = popUK[, unique(name)]
 
-# temp
-new_data = fread("~/Dropbox/uk_covid_data/data-2020-10-23.csv")
-new_data[, pid := match(location, nhs_regions) - 1]
-ld = new_data[indicator == "death_inc_line", .(date, N = value, name = location, pid)];
-sitreps = new_data[indicator != "death_inc_line", .(date = ymd(date), value_type = indicator, value, name = location, pid)]
-sitreps = dcast(sitreps, date + name + pid ~ value_type, value.var = "value", fill = NA, fun.aggregate = function(x) x[1])
-sitreps = sitreps[, .(date, n_in_itu = icu_prev, n_in_all_beds = hospital_prev, n_admitted_diagnosed = hospital_inc, name, pid)];
-
-pct = function(x) as.numeric(str_replace_all(x, "%", "")) / 100
-sero = fread("~/Dropbox/uk_covid_data/data/seroprev_nhs_regions_20201026.csv")
-sero = cbind(sero, sero[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
-sero[, Start.date := dmy(Start.date)]
-sero[, End.date := dmy(End.date)]
-virus = fread("~/Dropbox/uk_covid_data/data/virusprev_nhs_regions_20201026.csv")
-virus[, Start.date := dmy(Start.date)]
-virus[, End.date := dmy(End.date)]
-virus = cbind(virus, virus[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
-
-sero[, pid := match(NHS.region, nhs_regions) - 1]
-virus[, pid := match(NHS.region, nhs_regions) - 1]
-
-ggplot(virus) + 
-    geom_linerange(aes(x = Start.date + as.numeric(End.date - Start.date) / 2, 
-        ymin = pct(Lower.bound), ymax = pct(Upper.bound), colour = str_remove_all(Data.source, " R[0-9]"))) + 
-    facet_wrap(~NHS.region) + 
-    theme(legend.position = "bottom") +
-    labs(x = "Date", y = "Prevalence", colour = "Study")
-
-# Add England to deaths series
-ld = rbind(ld, 
-    ld[!name %in% c("Northern Ireland", "Scotland", "Wales"), .(N = sum(N), name = "England", pid = 1), by = date]
-)
-
-# Add England to sitrep series
-sitreps = rbind(sitreps,
-    sitreps[!name %in% c("Northern Ireland", "Scotland", "Wales"), 
-        .(n_in_itu = sum(n_in_itu, na.rm = T), n_in_all_beds = sum(n_in_all_beds, na.rm = T), n_admitted_diagnosed = sum(n_admitted_diagnosed, na.rm = T),
-            name = "England", pid = 1),
-        by = date]
-)
+# # temp
+# new_data = fread("~/Dropbox/uk_covid_data/data-2020-10-23.csv")
+# new_data[, pid := match(location, nhs_regions) - 1]
+# ld = new_data[indicator == "death_inc_line", .(date, N = value, name = location, pid)];
+# sitreps = new_data[indicator != "death_inc_line", .(date = ymd(date), value_type = indicator, value, name = location, pid)]
+# sitreps = dcast(sitreps, date + name + pid ~ value_type, value.var = "value", fill = NA, fun.aggregate = function(x) x[1])
+# sitreps = sitreps[, .(date, n_in_itu = icu_prev, n_in_all_beds = hospital_prev, n_admitted_diagnosed = hospital_inc, name, pid)];
+# 
+# pct = function(x) as.numeric(str_replace_all(x, "%", "")) / 100
+# sero = fread("~/Dropbox/uk_covid_data/data/seroprev_nhs_regions_20201026.csv")
+# sero = cbind(sero, sero[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
+# sero[, Start.date := dmy(Start.date)]
+# sero[, End.date := dmy(End.date)]
+# virus = fread("~/Dropbox/uk_covid_data/data/virusprev_nhs_regions_20201026.csv")
+# virus[, Start.date := dmy(Start.date)]
+# virus[, End.date := dmy(End.date)]
+# virus = cbind(virus, virus[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
+# 
+# sero[, pid := match(NHS.region, nhs_regions) - 1]
+# virus[, pid := match(NHS.region, nhs_regions) - 1]
+# 
+# ggplot(virus) + 
+#     geom_linerange(aes(x = Start.date + as.numeric(End.date - Start.date) / 2, 
+#         ymin = pct(Lower.bound), ymax = pct(Upper.bound), colour = str_remove_all(Data.source, " R[0-9]"))) + 
+#     facet_wrap(~NHS.region) + 
+#     theme(legend.position = "bottom") +
+#     labs(x = "Date", y = "Prevalence", colour = "Study")
+# 
+# # Add England to deaths series
+# ld = rbind(ld, 
+#     ld[!name %in% c("Northern Ireland", "Scotland", "Wales"), .(N = sum(N), name = "England", pid = 1), by = date]
+# )
+# 
+# # Add England to sitrep series
+# sitreps = rbind(sitreps,
+#     sitreps[!name %in% c("Northern Ireland", "Scotland", "Wales"), 
+#         .(n_in_itu = sum(n_in_itu, na.rm = T), n_in_all_beds = sum(n_in_all_beds, na.rm = T), n_admitted_diagnosed = sum(n_admitted_diagnosed, na.rm = T),
+#             name = "England", pid = 1),
+#         by = date]
+# )
 
 all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-10-23.qs")
 ld = all_data[[1]]
@@ -161,7 +161,7 @@ make_data = function(ld, sitreps, virus, sero)
 # parametersI = saved[[3]]
 # rm(saved)
 
-saved = qread("./fit_pp15.qs")
+saved = qread("./fit_pp24.qs")
 posteriorsI = saved[[1]]
 parametersI = saved[[2]]
 rm(saved)
@@ -372,9 +372,8 @@ lapply(posteriorsI, function(x) list(maxlp = max(x$lp), meanlp = mean(x$lp)))
 # PLOT FITS.
 #
 
-# Remove problematic virus entries
-virus = virus[omega > 1e-9]
-virus = virus[Data.source != "REACT-1 R1"] # very low...
+# # Remove problematic virus entries
+# virus = virus[omega > 1e-9]
 
 # Calculate total population
 popsize = NULL
@@ -568,10 +567,11 @@ post_tscatter = function(p, x, y, names)
                 population = p[variable == pickname(x[[i]], y[[i]]), population])
         
         plots[[i]] = ggplot(pp) +
-            geom_point(aes(x = x, y = y)) +
+            geom_bin2d(aes(x = x, y = y), bins = 60) +
             facet_wrap(~population, nrow = 1) +
             labs(x = NULL, y = names[i]) +
-            theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+            theme(axis.text.x = element_text(angle = 90, vjust = 0.5), legend.position = "none") +
+            scale_fill_gradient(low = "#ffffff", high = "#000000", na.value = "#ffffff")
     }
     
     return (plots)
@@ -783,3 +783,53 @@ ggplot(posteriorm[variable %in% variables[13:26] & variable != "cfr_final"]) +
 ggsave("./figures/posteriors_hist2.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors_hist2.png", width = 18, height = 24, units = "cm")
 
+
+
+
+# PREVIOUS MTPs
+theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
+m = rbind(
+    fread("~/Dropbox/uk_covid_data/forecast_2020-10-27B.csv"),
+    fread("~/Dropbox/uk_covid_data/forecast_2020-10-20.csv"),
+    fread("~/Dropbox/uk_covid_data/forecast_2020-10-14.csv"),
+    fread("~/Dropbox/uk_covid_data/forecast_2020-10-05b.csv"),
+    fread("~/Dropbox/uk_covid_data/forecast_2020-09-29b.csv"),
+    fread("~/Dropbox/uk_covid_data/LSHTM_Transmission_forecast_2020-11-02B.csv"),
+    use.names = FALSE
+)[AgeBand == "All"]
+m[, DateStamp := make_date(`Creation Year`, `Creation Month`, `Creation Day`)]
+m[, Date := make_date(`Year of Value`, `Month of Value`, `Day of Value`)]
+m = m[ValueType != "infections_inc"]
+
+m[ValueType == "hospital_inc", ValueType := "Admissions"]
+m[ValueType == "type28_death_inc_line", ValueType := "Deaths"]
+m[ValueType == "hospital_prev", ValueType := "Hosp beds occupied"]
+m[ValueType == "icu_prev", ValueType := "ICU beds occupied"]
+
+m[, min_date := min(Date), by = DateStamp]
+m = m[Date <= min_date + 7 * 6]
+
+data2 = fread("~/Dropbox/uk_covid_data/data-2020-11-06.csv")
+data2 = data2[location %in% c("East of England", "London", "Midlands", "North East and Yorkshire", "North West", "South East", "South West")]
+names(data2)[2] = "Geography"
+names(data2)[3] = "ValueType"
+data2[ValueType == "death_inc_line", ValueType := "Deaths"]
+data2[ValueType == "hospital_inc", ValueType := "Admissions"]
+data2[ValueType == "hospital_prev", ValueType := "Hosp beds occupied"]
+data2[ValueType == "icu_prev", ValueType := "ICU beds occupied"]
+
+data2
+data_england = data2[, .(value = sum(value)), by = .(ValueType, date)]
+data_england
+
+ggplot(m[Geography == "England"]) + 
+    geom_ribbon(aes(x = Date, ymin = `Quantile 0.05`, ymax = `Quantile 0.95`, group = DateStamp, fill = as.factor(DateStamp)), alpha = 0.5) + 
+    geom_line(data = data_england[date > "2020-09-15"], aes(x = date, y = value)) +
+    facet_wrap(~ValueType, scales = "free") +
+    theme(legend.position = c(0.02, 0.85)) +
+    labs(x = "Date", y = NULL, fill = "Date of projection") +
+    theme(legend.title = element_text(size = 8)) +
+    scale_color_viridis_d(aesthetics = c("colour", "fill"), option = "D")
+
+ggsave("./figures/MTPs.pdf", width = 18, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/MTPs.png", width = 18, height = 12, units = "cm")
