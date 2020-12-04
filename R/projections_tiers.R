@@ -5,13 +5,17 @@ source("./R/define_tiers.R")
 
 # RUN PROJECTIONS
 
+# get ldW4o parameters
+params_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13", parameters_only = TRUE)
+qsave(params_ldW4o, "./figures/params_ldW4o.qs")
+
 # ldN4o = lockdown, like Northern Ireland, 4 weeks, schools open
-proj_basic = project(england_pops, tiers = FALSE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_tiers = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldN4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldN4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+proj_basic = project(england_pops, tiers = FALSE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,                  close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_tiers = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        se = seN, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldN4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldN4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
 
 plot_projection(list(proj_basic, proj_tiers), list("No tiers", "Tiers"), "2020-10-01", "Dark2")
 ggsave("./figures/proj_tiers.png", width = 24, height = 12, units = "cm")
@@ -23,52 +27,35 @@ plot_projection(list(proj_tiers, proj_ldW4o, proj_ldW4c), list("Tiers only", "Wa
 ggsave("./figures/proj_ld_W.png", width = 24, height = 12, units = "cm")
 ggsave("./figures/proj_ld_W.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
 
-## TEMP ##
-proj_ld2Woa = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-08", "2021-01-07"), cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ld2Wob = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-22", "2021-01-07"), cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ld2Woc = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-08", "2020-12-31"), cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ld2Wod = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-22", "2020-12-31"), cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ld2Woe = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-08", "2020-12-10"), cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ld2Wof = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = c("2020-10-01", "2020-12-03"), cb_duration = c(27, 13), lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-
-plot_projection(list(proj_ldW4o, proj_ld2Woa, proj_ld2Wob, proj_ld2Woc, proj_ld2Wod, proj_ld2Woe, proj_ld2Wof), 
-    list("One lockdown", "Two lockdowns a", "Two lockdowns b", "Two lockdowns c", "Two lockdowns d", "Two lockdowns e", "Two lockdowns f"), 
-    "2020-10-01", "Set2")
-
-plot_cum_deaths(list(proj_ldW4o, proj_ld2Woa, proj_ld2Wob, proj_ld2Woc, proj_ld2Wod, proj_ld2Woe, proj_ld2Wof), 
-    c("1 Ld", "2 Ld a", "2 Ld b", "2 Ld c", "2 Ld d", "2 Ld e", "2 Ld f"), 
-    "2020-10-01", ystart = 28, ydiff = -2.1, titl = "Type of intervention")
-## / TEMP ##
-
 # Different duration of lockdown
-proj_ldW1o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 6, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW2o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 13, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW3o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 20, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW5o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 34, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW6o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 41, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW1o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration =  6, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW2o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 13, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW3o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 20, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW5o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 34, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW6o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 41, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
 
 # Different timing of lockdown
-proj_ldW4o_10_08 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-08", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_10_15 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-15", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_10_22 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-22", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_10_29 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-29", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_11_05 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_11_12 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-12", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
-proj_ldW4o_11_19 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-19", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_10_08 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-08", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_10_15 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-15", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_10_22 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-22", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_10_29 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-29", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_11_05 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_11_12 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-12", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldW4o_11_19 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-19", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
 
 # Sensitivity analyses with waning and seasonality
-proj_tiers_w  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_tiers_w  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = 40*7, seasonality = 0)
-proj_ldW4o_w  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_ldW4o_w  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = 40*7, seasonality = 0)
-proj_tiers_s  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_tiers_s  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = -1, seasonality = 0.1)
-proj_ldW4o_s  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_ldW4o_s  = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = -1, seasonality = 0.1)
-proj_tiers_ws = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_tiers_ws = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = 40*7, seasonality = 0.1)
-proj_ldW4o_ws = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
+proj_ldW4o_ws = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13",
     waning_duration = 40*7, seasonality = 0.1)
 
 plot_projection(list(proj_tiers_w, proj_ldW4o_w), list("Tiers + waning immunity", "Lockdown + waning immunity"), "2020-10-01", "Set1")
@@ -112,33 +99,17 @@ tbSensitivity = england_only(list(tbTi, tbWo, tbs_tiers_s, tbs_ldown_s, tbs_tier
     c("Tiers only", "Lockdown", "Tiers only + seasonality", "Lockdown + seasonality", "Tiers only + waning", "Lockdown + waning", "Tiers only + seasonality + waning", "Lockdown + seasonality + waning"))
 fwrite(tbSensitivity, "./figures/table_sensitivity.csv");
 
+R_tiers = arrs_tier(proj_tiers)
+R_ldN4o = arrs_ld(proj_ldN4o)
+R_ldN4c = arrs_ld(proj_ldN4c)
+R_ldW4o = arrs_ld(proj_ldW4o)
+R_ldW4c = arrs_ld(proj_ldW4c)
 
-arrs = function(proj) {
-    w = proj[group == 1 & t %in% c(308, 310), obs0, by = .(run, population, t)]
-    w = rbind(w, data.table(population = w[t == 310, population], obs0 = w[t == 308]$obs0 - w[t == 310]$obs0), fill = TRUE)
-    
-    w = w[, .(Rt = niceq(obs0)), by = .(population, t)]
-    w[t == 308, when := "Pre-lockdown"]
-    w[t == 310, when := "Post-lockdown"]
-    w[is.na(t), when := "Reduction"]
-    w[, when := factor(when, unique(when))]
-    dcast(w, population ~ when, value.var = "Rt")
-}
-
-R_ldN4o = arrs(proj_ldN4o)
-R_ldN4c = arrs(proj_ldN4c)
-R_ldW4o = arrs(proj_ldW4o)
-R_ldW4c = arrs(proj_ldW4c)
-
-combine_R = function(R_ldN4o, R_ldN4c) {
-    R_ldN4 = cbind(R_ldN4o[, 1:3], R_ldN4c[, 3], R_ldN4o[, 4], R_ldN4c[, 4])
-    names(R_ldN4)[c(3,5)] = paste0(names(R_ldN4)[c(3,5)], ", schools open")
-    names(R_ldN4)[c(4,6)] = paste0(names(R_ldN4)[c(4,6)], ", schools closed")
-    R_ldN4
-}
-
-fwrite(combine_R(R_ldN4o, R_ldN4c), "./figures/R0_table_N.csv")
-fwrite(combine_R(R_ldW4o, R_ldW4c), "./figures/R0_table_W.csv")
+fwrite(R_tiers, "./figures/R0_table_tiers.csv")
+fwrite(R_ldN4o, "./figures/R0_table_N4o.csv")
+fwrite(R_ldN4c, "./figures/R0_table_N4c.csv")
+fwrite(R_ldW4o, "./figures/R0_table_W4o.csv")
+fwrite(R_ldW4c, "./figures/R0_table_W4c.csv")
 
 series_weeks = rbind(
     summarize_projection(proj_tiers, "2020-10-01", popsize, "No lockdown"),
@@ -172,67 +143,9 @@ series_what = rbind(
 )
 series_what[, scenario := factor(scenario, unique(scenario))]
 
-plot_indicator = function(series, indicator_name)
-{
-    ggplot(series[indicator == indicator_name]) +
-        geom_pointrange(aes(x = population, ymin = lo, y = mid, ymax = hi, colour = scenario), position = position_dodge(width = 0.8), shape = 20, size = 0.0) +
-        geom_linerange(aes(x = population, ymin = lo, y = mid, ymax = hi, colour = scenario), position = position_dodge(width = 0.8), size = 0.2) +
-        labs(x = NULL, y = indicator_name) + ylim(0, NA)
-}
-
-plot_indicators_england = function(series, indicator_names, y_axis_title, unit = 1, legpos = "none", pal = "Dark2")
-{
-    ggplot(series[population == "England" & indicator %in% indicator_names]) +
-        geom_ribbon(aes(x = scenario, ymin = lo / unit, ymax = hi / unit, fill = indicator, group = indicator), alpha = 0.5) +
-        geom_line(aes(x = scenario, y = mid / unit, colour = indicator, group = indicator), size = 0.2) +
-        labs(x = NULL, y = y_axis_title, fill = NULL, colour = NULL) + ylim(0, NA) +
-        theme(panel.background = element_rect(fill = "#f4f4f4"),
-            panel.grid.major = element_line(colour = "#ffffff", size = 0.2),
-            legend.position = legpos) +
-        scale_color_brewer(aesthetics = c("colour", "fill"), palette = pal)
-}
-
-plot_indicators_england_stack = function(series, indicator_names, y_axis_title, stack_order, legpos = "none", pal = "Set2")
-{
-    ser2 = rlang::duplicate(series[population == "England" & indicator %in% indicator_names])
-    ser2[, indicator := factor(indicator, stack_order)]
-    ser3 = rlang::duplicate(ser2)
-    ser3 = ser3[order(scenario, rev(indicator))]
-    ser3[, lo := lo - mid]
-    ser3[, hi := hi - mid]
-    ser3[, mid := cumsum(mid), by = scenario]
-    ser3[, lo := mid + lo]
-    ser3[, hi := mid + hi]
-
-    ggplot() +
-        geom_area(data = ser2, aes(x = scenario, y = mid, fill = indicator, group = indicator)) +
-        geom_ribbon(data = ser3, aes(x = scenario, ymin = lo, ymax = hi, group = indicator), alpha = 0.25) +
-        labs(x = NULL, y = y_axis_title, fill = NULL, colour = NULL) + ylim(0, NA) +
-        theme(panel.background = element_rect(fill = "#f4f4f4"),
-            panel.grid.major = element_line(colour = "#ffffff", size = 0.2),
-            legend.position = legpos) +
-        scale_color_brewer(aesthetics = c("colour", "fill"), palette = pal)
-}
-
-plot_indicator_regions = function(series, indicator_name, label = indicator_name, suffix = "\n(Thousands)", unit = 1000, legpos = "none", bigtitle = NULL)
-{
-    ser2 = rlang::duplicate(series[population != "England" & indicator == indicator_name])
-    ser2[population == "East of England", population := "EE"]
-    ser2[population == "London", population := "Ldn"]
-    ser2[population == "Midlands", population := "Mlds"]
-    ser2[population == "North East and Yorkshire", population := "NE&Y"]
-    ser2[population == "North West", population := "NW"]
-    ser2[population == "South East", population := "SE"]
-    ser2[population == "South West", population := "SW"]
-    ggplot(ser2) +
-        geom_point(aes(x = population, y = mid / unit, colour = scenario), position = position_dodge(width = 0.8), shape = 20, size = 0.5) +
-        geom_linerange(aes(x = population, ymin = lo / unit, ymax = hi / unit, colour = scenario), position = position_dodge(width = 0.8), size = 0.3) +
-        labs(x = NULL, y = paste0(label, suffix), colour = NULL, title = bigtitle) + 
-        ylim(0, NA) +
-        theme(legend.position = legpos)
-}
 
 # Regional plots: Type of intervention
+theme_set(theme_cowplot(font_size = 6))
 pr1  = plot_indicator_regions(series_what, "Deaths", legpos = "top", bigtitle = "Type of intervention")
 pr2  = plot_indicator_regions(series_what, "Admissions")
 pr3  = plot_indicator_regions(series_what, "Cases")
@@ -355,3 +268,174 @@ ggsave("./figures/big_timing.pdf", pp3, width = 7, height = 12, units = "cm")
 pp = plot_grid(pp1, pp2, pp3, nrow = 1, label_size = 8, labels = letters)
 ggsave("./figures/big.pdf", pp, width = 21, height = 12, units = "cm", useDingbats = FALSE)
 ggsave("./figures/big.png", pp, width = 21, height = 12, units = "cm")
+
+
+
+
+
+
+
+
+
+
+# New 29 Nov 2020 - England lockdown
+# RUN PROJECTIONS
+
+# get ldE4o parameters
+params_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13", parameters_only = TRUE)
+qsave(params_ldE4o, "./figures/params_ldE4o.qs")
+
+# ldN4o = lockdown, like Northern Ireland, 4 weeks, schools open
+#proj_basic = project(england_pops, tiers = FALSE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,                  close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+#proj_tiers = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,        se = seN, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+#proj_ldN4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+#proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+#proj_ldN4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+#proj_ldW4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+
+plot_projection(list(proj_basic, proj_tiers), list("No tiers", "Tiers"), "2020-10-01", "Dark2")
+ggsave("./figures/NEW_proj_tiers.png", width = 24, height = 12, units = "cm")
+ggsave("./figures/NEW_proj_tiers.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
+plot_projection(list(proj_tiers, proj_ldN4o, proj_ldN4c), list("Tiers only", "NI lockdown, schools open", "NI lockdown, schools closed"), "2020-10-01", "Set2")
+ggsave("./figures/NEW_proj_ld_N.png", width = 24, height = 12, units = "cm")
+ggsave("./figures/NEW_proj_ld_N.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
+plot_projection(list(proj_tiers, proj_ldW4o, proj_ldW4c), list("Tiers only", "Wales lockdown, schools open", "Wales lockdown, schools closed"), "2020-10-01", "Set2")
+ggsave("./figures/NEW_proj_ld_W.png", width = 24, height = 12, units = "cm")
+ggsave("./figures/NEW_proj_ld_W.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
+plot_projection(list(proj_tiers, proj_ldE4o, proj_ldE4c), list("Tiers only", "England lockdown, schools open", "England lockdown, schools closed"), "2020-10-01", "Set2")
+ggsave("./figures/NEW_proj_ld_E.png", width = 24, height = 12, units = "cm")
+ggsave("./figures/NEW_proj_ld_E.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
+
+# Different duration of lockdown
+proj_ldE1o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration =  6, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE2o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 13, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE3o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 20, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE5o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 34, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE6o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 41, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+
+# Different timing of lockdown
+proj_ldE4o_10_08 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-08", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_10_15 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-15", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_10_22 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-22", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_10_29 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-10-29", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_11_05 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_11_12 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-12", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+proj_ldE4o_11_19 = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-19", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
+
+
+R_ldE4o = arrs_ld(proj_ldE4o)
+R_ldE4c = arrs_ld(proj_ldE4c)
+
+fwrite(R_ldE4o, "./figures/R0_table_E4o.csv")
+fwrite(R_ldE4c, "./figures/R0_table_E4c.csv")
+
+series_weeks = rbind(
+    summarize_projection(proj_tiers, "2020-10-01", popsize, "No lockdown"),
+    summarize_projection(proj_ldE1o, "2020-10-01", popsize, "1 week"),
+    summarize_projection(proj_ldE2o, "2020-10-01", popsize, "2 weeks"),
+    summarize_projection(proj_ldE3o, "2020-10-01", popsize, "3 weeks"),
+    summarize_projection(proj_ldE4o, "2020-10-01", popsize, "4 weeks"),
+    summarize_projection(proj_ldE5o, "2020-10-01", popsize, "5 weeks"),
+    summarize_projection(proj_ldE6o, "2020-10-01", popsize, "6 weeks")
+)
+series_weeks[, scenario := factor(scenario, unique(scenario))]
+
+series_timing = rbind(
+    summarize_projection(proj_ldE4o_10_08, "2020-10-01", popsize, "8 Oct"),
+    summarize_projection(proj_ldE4o_10_15, "2020-10-01", popsize, "15 Oct"),
+    summarize_projection(proj_ldE4o_10_22, "2020-10-01", popsize, "22 Oct"),
+    summarize_projection(proj_ldE4o_10_29, "2020-10-01", popsize, "29 Oct"),
+    summarize_projection(proj_ldE4o_11_05, "2020-10-01", popsize, "5 Nov"),
+    summarize_projection(proj_ldE4o_11_12, "2020-10-01", popsize, "12 Nov"),
+    summarize_projection(proj_ldE4o_11_19, "2020-10-01", popsize, "19 Nov")
+)
+series_timing[, scenario := factor(scenario, unique(scenario))]
+
+series_what = rbind(
+    summarize_projection(proj_basic, "2020-10-01", popsize, "Nothing"),
+    summarize_projection(proj_tiers, "2020-10-01", popsize, "Tiers"),
+    summarize_projection(proj_ldN4o, "2020-10-01", popsize, "Ld N/o"),
+    summarize_projection(proj_ldN4c, "2020-10-01", popsize, "Ld N/c"),
+    summarize_projection(proj_ldW4o, "2020-10-01", popsize, "Ld W/o"),
+    summarize_projection(proj_ldW4c, "2020-10-01", popsize, "Ld W/c"),
+    summarize_projection(proj_ldE4o, "2020-10-01", popsize, "Ld E/o"),
+    summarize_projection(proj_ldE4c, "2020-10-01", popsize, "Ld E/c")
+)
+series_what[, scenario := factor(scenario, unique(scenario))]
+
+
+# Comparative plots: Type of intervention
+p0 = plot_cum_deaths(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c, proj_ldE4o, proj_ldE4c), 
+    c("Nothing", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c", "Ld E/o", "Ld E/c"), 
+    "2020-10-01", ystart = 29.6, ydiff = -2, titl = "Type of intervention")
+p1 = plot_icu(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c, proj_ldE4o, proj_ldE4c), 
+    c("Nothing", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c", "Ld E/o", "Ld E/c"), 
+    "2020-10-01")
+p7 = plot_indicators_england(series_what, c("Weeks of high ICU occupancy",
+    "Weeks of high hospital occupancy"), "Hospital pressure\n(weeks)", legpos = "bottom")
+p8 = plot_indicators_england_stack(series_what, c(
+    "Weeks in Tier 2",
+    "Weeks in Tier 3",
+    "Weeks in lockdown"), "Time under\nrestrictions (weeks)", stack_order = c("Weeks in Tier 2", "Weeks in Tier 3", "Weeks in lockdown"), legpos = "bottom")
+
+theme_set(theme_cowplot(font_size = 6))
+pp1 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
+ggsave("./figures/NEW_big_what.pdf", pp1, width = 7, height = 12, units = "cm")
+
+
+# Comparative plots: Duration of lockdown
+p0 = plot_cum_deaths(list(proj_tiers, proj_ldE1o, proj_ldE2o, proj_ldE3o, proj_ldE4o, proj_ldE5o, proj_ldE6o), 
+    c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
+    "2020-10-01", ystart = 25.9, ydiff = -1.7, titl = "Duration of lockdown")
+p1 = plot_icu(list(proj_tiers, proj_ldE1o, proj_ldE2o, proj_ldE3o, proj_ldE4o, proj_ldE5o, proj_ldE6o), 
+    c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
+    "2020-10-01")
+p7 = plot_indicators_england(series_weeks, c("Weeks of high ICU occupancy",
+    "Weeks of high hospital occupancy"), "Hospital pressure\n(weeks)", legpos = "bottom")
+p8 = plot_indicators_england_stack(series_weeks, c(
+    "Weeks in Tier 2",
+    "Weeks in Tier 3",
+    "Weeks in lockdown"), "Time under\nrestrictions (weeks)", stack_order = c("Weeks in Tier 2", "Weeks in Tier 3", "Weeks in lockdown"), legpos = "bottom")
+
+theme_set(theme_cowplot(font_size = 6))
+pp2 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
+ggsave("./figures/NEW_big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
+
+
+# Comparative plots: Timing of lockdown
+p0 = plot_cum_deaths(list(proj_ldE4o_10_08, proj_ldE4o_10_15, proj_ldE4o_10_22, proj_ldE4o_10_29, proj_ldE4o_11_05, proj_ldE4o_11_12, proj_ldE4o_11_19), 
+    c(  "                  8 Oct", 
+        "                      15 Oct", 
+        "                          22 Oct", 
+        "29 Oct", 
+        "5 Nov", 
+        "12 Nov", 
+        "19 Nov"), 
+    "2020-10-01", ystart = 23.6, ydiff = -1.43, titl = "Timing of lockdown")
+p1 = plot_icu(list(proj_ldE4o_10_08, proj_ldE4o_10_15, proj_ldE4o_10_22, proj_ldE4o_10_29, proj_ldE4o_11_05, proj_ldE4o_11_12, proj_ldE4o_11_19), 
+    c(  "                  8 Oct", 
+        "                      15 Oct", 
+        "                          22 Oct", 
+        "29 Oct", 
+        "5 Nov", 
+        "12 Nov", 
+        "19 Nov"), 
+    "2020-10-01")
+p7 = plot_indicators_england(series_timing, c("Weeks of high ICU occupancy",
+    "Weeks of high hospital occupancy"), "Hospital pressure\n(weeks)", legpos = "bottom")
+p8 = plot_indicators_england_stack(series_timing, c(
+    "Weeks in Tier 2",
+    "Weeks in Tier 3",
+    "Weeks in lockdown"), "Time under\nrestrictions (weeks)", stack_order = c("Weeks in Tier 2", "Weeks in Tier 3", "Weeks in lockdown"), legpos = "bottom")
+
+theme_set(theme_cowplot(font_size = 6))
+pp3 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
+ggsave("./figures/NEW_big_timing.pdf", pp3, width = 7, height = 12, units = "cm")
+
+
+pp = plot_grid(pp1, pp2, pp3, nrow = 1, label_size = 8, labels = letters)
+ggsave("./figures/NEW_big.pdf", pp, width = 21, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/NEW_big.png", pp, width = 21, height = 12, units = "cm")

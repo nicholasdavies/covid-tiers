@@ -9,6 +9,7 @@ library(qs)
 
 # Load Google Mobility data
 gm = qread("./data/google_mobility_uk.qs")
+gm = gm[date <= "2020-10-27"]
 
 # Google places
 gp = rbind(
@@ -219,9 +220,11 @@ ggsave("./figures/tiers_analysis_4.png", width = 25, height = 15, units = "cm")
 # Impact of tiers
 individual = resultsD[tier != "T 0", .(detrend = mean(detrend), baseline = mean(original), change = mean(detrend - baseline)), 
     by = .(full_region, sub_region_1, indic, tier)]
-summary = individual[, .(change = mean(change)), keyby = .(indic, tier)]
+summary = individual[, .(change = mean(change), d = var(change)/.N), keyby = .(indic, tier)]
 summary[, T1 := first(change), by = indic]
-summary = summary[, .(change = change - T1), keyby = .(indic, tier)]
+summary[, T1d := first(d), by = indic]
+summary = summary[, .(change = change - T1, sd = sqrt(d + T1d)), keyby = .(indic, tier)]
+summary[tier == "T 1", sd := 0]
 summary
 
 ggplot(individual) +

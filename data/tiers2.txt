@@ -1,0 +1,170 @@
+ladcd,date,tier,reg1,reg2
+E06000049,2020-10-14,2,Cheshire,Cheshire East
+E06000050,2020-10-14,2,Cheshire,Cheshire West and Chester
+E06000007,2020-10-14,2,Cheshire,Warrington
+E07000037,2020-10-14,2,Derbyshire,parts of High Peak
+E06000047,2020-10-14,2,Durham,Durham
+E08000001,2020-10-14,2,Greater Manchester,Bolton
+E08000002,2020-10-14,2,Greater Manchester,Bury
+E08000003,2020-10-14,2,Greater Manchester,Manchester
+E08000004,2020-10-14,2,Greater Manchester,Oldham
+E08000005,2020-10-14,2,Greater Manchester,Rochdale
+E08000006,2020-10-14,2,Greater Manchester,Salford
+E08000007,2020-10-14,2,Greater Manchester,Stockport
+E08000008,2020-10-14,2,Greater Manchester,Tameside
+E08000009,2020-10-14,2,Greater Manchester,Trafford
+E08000010,2020-10-14,2,Greater Manchester,Wigan
+E06000016,2020-10-14,2,Leicestershire,Leicester
+E07000135,2020-10-14,2,Leicestershire,Oadby and Wigston
+E06000057,2020-10-14,2,Northumberland,Northumberland
+E07000170,2020-10-14,2,Nottinghamshire,Ashfield
+E07000171,2020-10-14,2,Nottinghamshire,Bassetlaw
+E07000172,2020-10-14,2,Nottinghamshire,Broxtowe
+E07000173,2020-10-14,2,Nottinghamshire,Gedling
+E07000174,2020-10-14,2,Nottinghamshire,Mansfield
+E07000175,2020-10-14,2,Nottinghamshire,Newark & Sherwood
+E06000018,2020-10-14,2,Nottinghamshire,Nottingham
+E07000176,2020-10-14,2,Nottinghamshire,Rushcliffe
+E08000016,2020-10-14,2,South Yorkshire,Barnsley
+E08000017,2020-10-14,2,South Yorkshire,Doncaster
+E08000018,2020-10-14,2,South Yorkshire,Rotherham
+E08000019,2020-10-14,2,South Yorkshire,Sheffield
+E06000005,2020-10-14,2,Tees Valley,Darlington
+E06000001,2020-10-14,2,Tees Valley,Hartlepool
+E06000002,2020-10-14,2,Tees Valley,Middlesbrough
+E06000003,2020-10-14,2,Tees Valley,Redcar and Cleveland
+E06000004,2020-10-14,2,Tees Valley,Stockton-on-Tees
+E08000037,2020-10-14,2,Tyne and Wear,Gateshead
+E08000021,2020-10-14,2,Tyne and Wear,Newcastle
+E08000022,2020-10-14,2,Tyne and Wear,North Tyneside
+E08000023,2020-10-14,2,Tyne and Wear,South Tyneside
+E08000024,2020-10-14,2,Tyne and Wear,Sunderland
+E08000025,2020-10-14,2,West Midlands,Birmingham
+E08000028,2020-10-14,2,West Midlands,Sandwell
+E08000029,2020-10-14,2,West Midlands,Solihull
+E08000031,2020-10-14,2,West Midlands,Wolverhampton
+E08000030,2020-10-14,2,West Midlands,Walsall
+E08000032,2020-10-14,2,West Yorkshire,Bradford
+E08000033,2020-10-14,2,West Yorkshire,Calderdale
+E08000034,2020-10-14,2,West Yorkshire,Kirklees
+E08000035,2020-10-14,2,West Yorkshire,Leeds
+E08000036,2020-10-14,2,West Yorkshire,Wakefield.
+E07000027,2020-10-17,2,Cumbria,Barrow-in-Furness
+E07000034,2020-10-17,2,Derbyshire,Chesterfield
+E07000036,2020-10-17,2,Derbyshire,Erewash
+E07000038,2020-10-17,2,Derbyshire,North East Derbyshire
+E07000066,2020-10-17,2,Essex,Basildon
+E07000067,2020-10-17,2,Essex,Braintree
+E07000068,2020-10-17,2,Essex,Brentwood
+E07000069,2020-10-17,2,Essex,Castle Point
+E07000070,2020-10-17,2,Essex,Chelmsford
+E07000071,2020-10-17,2,Essex,Colchester
+E07000072,2020-10-17,2,Essex,Epping Forest
+E07000073,2020-10-17,2,Essex,Harlow
+E07000074,2020-10-17,2,Essex,Maldon
+E07000075,2020-10-17,2,Essex,Rochford
+E07000076,2020-10-17,2,Essex,Tendring
+E07000077,2020-10-17,2,Essex,Uttlesford
+E09000001,2020-10-17,2,Greater London,City of London
+E09000002,2020-10-17,2,Greater London,Barking and Dagenham
+E09000003,2020-10-17,2,Greater London,Barnet
+E09000004,2020-10-17,2,Greater London,Bexley
+E09000005,2020-10-17,2,Greater London,Brent
+E09000006,2020-10-17,2,Greater London,Bromley
+E09000007,2020-10-17,2,Greater London,Camden
+E09000008,2020-10-17,2,Greater London,Croydon
+E09000009,2020-10-17,2,Greater London,Ealing
+E09000010,2020-10-17,2,Greater London,Enfield
+E09000011,2020-10-17,2,Greater London,Greenwich
+E09000012,2020-10-17,2,Greater London,Hackney
+E09000013,2020-10-17,2,Greater London,Hammersmith and Fulham
+E09000014,2020-10-17,2,Greater London,Haringey
+E09000015,2020-10-17,2,Greater London,Harrow
+E09000016,2020-10-17,2,Greater London,Havering
+E09000017,2020-10-17,2,Greater London,Hillingdon
+E09000018,2020-10-17,2,Greater London,Hounslow
+E09000019,2020-10-17,2,Greater London,Islington
+E09000020,2020-10-17,2,Greater London,Kensington and Chelsea
+E09000021,2020-10-17,2,Greater London,Kingston upon Thames
+E09000022,2020-10-17,2,Greater London,Lambeth
+E09000023,2020-10-17,2,Greater London,Lewisham
+E09000024,2020-10-17,2,Greater London,Merton
+E09000025,2020-10-17,2,Greater London,Newham
+E09000026,2020-10-17,2,Greater London,Redbridge
+E09000027,2020-10-17,2,Greater London,Richmond upon Thames
+E09000028,2020-10-17,2,Greater London,Southwark
+E09000029,2020-10-17,2,Greater London,Sutton
+E09000030,2020-10-17,2,Greater London,Tower Hamlets
+E09000031,2020-10-17,2,Greater London,Waltham Forest
+E09000032,2020-10-17,2,Greater London,Wandsworth
+E09000033,2020-10-17,2,Greater London,Westminster
+E06000014,2020-10-17,2,North Yorkshire,York
+E07000207,2020-10-17,2,Surrey,Elmbridge
+E06000006,2020-10-17,3,Liverpool region,Halton
+E08000011,2020-10-17,3,Liverpool region,Knowsley
+E08000012,2020-10-17,3,Liverpool region,Liverpool
+E08000014,2020-10-17,3,Liverpool region,Sefton
+E08000013,2020-10-17,3,Liverpool region,St Helens
+E08000015,2020-10-17,3,Liverpool region,Wirral
+E06000009,2020-10-17,3,Lancashire,Blackpool
+E06000008,2020-10-17,3,Lancashire,Blackburn with Darwen
+E07000117,2020-10-17,3,Lancashire,Burnley
+E07000118,2020-10-17,3,Lancashire,Chorley
+E07000119,2020-10-17,3,Lancashire,Fylde
+E07000120,2020-10-17,3,Lancashire,Hyndburn
+E07000121,2020-10-17,3,Lancashire,Lancaster City Council
+E07000122,2020-10-17,3,Lancashire,Pendle
+E07000123,2020-10-17,3,Lancashire,Preston
+E07000124,2020-10-17,3,Lancashire,Ribble Valley
+E07000125,2020-10-17,3,Lancashire,Rossendale
+E07000126,2020-10-17,3,Lancashire,South Ribble
+E07000127,2020-10-17,3,Lancashire,West Lancashire
+E07000128,2020-10-17,3,Lancashire,Wyre
+E08000001,2020-10-23,3,Greater Manchester,Bolton
+E08000002,2020-10-23,3,Greater Manchester,Bury
+E08000003,2020-10-23,3,Greater Manchester,Manchester
+E08000004,2020-10-23,3,Greater Manchester,Oldham
+E08000005,2020-10-23,3,Greater Manchester,Rochdale
+E08000006,2020-10-23,3,Greater Manchester,Salford
+E08000007,2020-10-23,3,Greater Manchester,Stockport
+E08000008,2020-10-23,3,Greater Manchester,Tameside
+E08000009,2020-10-23,3,Greater Manchester,Trafford
+E08000010,2020-10-23,3,Greater Manchester,Wigan
+E06000039,2020-10-24,2,Berkshire,Slough
+E06000021,2020-10-24,2,Staffordshire,Stoke-on-Trent
+E08000026,2020-10-24,2,West Midlands,Coventry
+E08000016,2020-10-24,3,South Yorkshire,Barnsley
+E08000017,2020-10-24,3,South Yorkshire,Doncaster
+E08000018,2020-10-24,3,South Yorkshire,Rotherham
+E08000019,2020-10-24,3,South Yorkshire,Sheffield
+E06000007,2020-10-27,3,Cheshire,Warrington
+E07000170,2020-10-30,3,Nottinghamshire,Ashfield
+E07000171,2020-10-30,3,Nottinghamshire,Bassetlaw
+E07000172,2020-10-30,3,Nottinghamshire,Broxtowe
+E07000173,2020-10-30,3,Nottinghamshire,Gedling
+E07000174,2020-10-30,3,Nottinghamshire,Mansfield
+E07000175,2020-10-30,3,Nottinghamshire,Newark & Sherwood
+E06000018,2020-10-30,3,Nottinghamshire,Nottingham
+E07000176,2020-10-30,3,Nottinghamshire,Rushcliffe
+E06000032,2020-10-31,2,Bedfordshire,Luton
+E07000032,2020-10-31,2,Derbyshire,Amber Valley
+E07000033,2020-10-31,2,Derbyshire,Bolsover
+E06000015,2020-10-31,2,Derbyshire,Derby
+E07000035,2020-10-31,2,Derbyshire,Derbyshire Dales
+E07000037,2020-10-31,2,Derbyshire,High Peak
+E07000039,2020-10-31,2,Derbyshire,South Derbyshire
+E06000011,2020-10-31,2,East Riding of Yorkshire,East Riding & Hull
+E06000020,2020-10-31,2,Shropshire,Telford and Wrekin
+E07000130,2020-10-31,2,Leicestershire,Charnwood
+E06000012,2020-10-31,2,Lincolnshire,North East Linconlshire
+E06000013,2020-10-31,2,Lincolnshire,North Linconlshire
+E07000178,2020-10-31,2,Oxfordshire,Oxford
+E07000193,2020-10-31,2,Staffordshire,East Staffordshire
+E07000194,2020-10-31,2,Staffordshire,Lichfield
+E07000195,2020-10-31,2,Staffordshire,Newcastle-under-Lyme
+E07000196,2020-10-31,2,Staffordshire,South Staffordshire
+E07000197,2020-10-31,2,Staffordshire,Stafford
+E07000198,2020-10-31,2,Staffordshire,Staffordshire Moorlands
+E07000199,2020-10-31,2,Staffordshire,Tamworth
+E08000027,2020-10-31,2,West Midlands,Dudley
+E07000028,2020-10-31,2,Cumbria,Carlisle

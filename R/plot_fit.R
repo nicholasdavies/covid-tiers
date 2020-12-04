@@ -32,49 +32,9 @@ source("~/Documents/covidm_MTPs/spim_output.R");
 #
 
 nhs_regions = popUK[, unique(name)]
-
-# # temp
-# new_data = fread("~/Dropbox/uk_covid_data/data-2020-10-23.csv")
-# new_data[, pid := match(location, nhs_regions) - 1]
-# ld = new_data[indicator == "death_inc_line", .(date, N = value, name = location, pid)];
-# sitreps = new_data[indicator != "death_inc_line", .(date = ymd(date), value_type = indicator, value, name = location, pid)]
-# sitreps = dcast(sitreps, date + name + pid ~ value_type, value.var = "value", fill = NA, fun.aggregate = function(x) x[1])
-# sitreps = sitreps[, .(date, n_in_itu = icu_prev, n_in_all_beds = hospital_prev, n_admitted_diagnosed = hospital_inc, name, pid)];
-# 
-# pct = function(x) as.numeric(str_replace_all(x, "%", "")) / 100
-# sero = fread("~/Dropbox/uk_covid_data/data/seroprev_nhs_regions_20201026.csv")
-# sero = cbind(sero, sero[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
-# sero[, Start.date := dmy(Start.date)]
-# sero[, End.date := dmy(End.date)]
-# virus = fread("~/Dropbox/uk_covid_data/data/virusprev_nhs_regions_20201026.csv")
-# virus[, Start.date := dmy(Start.date)]
-# virus[, End.date := dmy(End.date)]
-# virus = cbind(virus, virus[, skew_normal_solve(pct(Central.estimate), pct(Lower.bound), pct(Upper.bound))]);
-# 
-# sero[, pid := match(NHS.region, nhs_regions) - 1]
-# virus[, pid := match(NHS.region, nhs_regions) - 1]
-# 
-# ggplot(virus) + 
-#     geom_linerange(aes(x = Start.date + as.numeric(End.date - Start.date) / 2, 
-#         ymin = pct(Lower.bound), ymax = pct(Upper.bound), colour = str_remove_all(Data.source, " R[0-9]"))) + 
-#     facet_wrap(~NHS.region) + 
-#     theme(legend.position = "bottom") +
-#     labs(x = "Date", y = "Prevalence", colour = "Study")
-# 
-# # Add England to deaths series
-# ld = rbind(ld, 
-#     ld[!name %in% c("Northern Ireland", "Scotland", "Wales"), .(N = sum(N), name = "England", pid = 1), by = date]
-# )
-# 
-# # Add England to sitrep series
-# sitreps = rbind(sitreps,
-#     sitreps[!name %in% c("Northern Ireland", "Scotland", "Wales"), 
-#         .(n_in_itu = sum(n_in_itu, na.rm = T), n_in_all_beds = sum(n_in_all_beds, na.rm = T), n_admitted_diagnosed = sum(n_admitted_diagnosed, na.rm = T),
-#             name = "England", pid = 1),
-#         by = date]
-# )
-
 all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-10-23.qs")
+# for more recent data:
+# all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-11-27.qs")
 ld = all_data[[1]]
 sitreps = all_data[[2]]
 virus = all_data[[3]]
@@ -146,7 +106,7 @@ make_data = function(ld, sitreps, virus, sero)
         virus[Data.source %like% "REACT", .(ValueType = "pcr_prev", Geography = NHS.region,
             dmin = as.Date(Start.date), d = as.Date(Start.date) + (as.Date(End.date) - as.Date(Start.date)) / 2, dmax = as.Date(End.date), 
             ymin = pct(Lower.bound), y = pct(Central.estimate), ymax = pct(Upper.bound))],
-        sero[!Data.source %like% "NHS BT", .(ValueType = "sero_prev", Geography = NHS.region,
+        sero[!Data.source %like% "NHSBT", .(ValueType = "sero_prev", Geography = NHS.region,
             dmin = as.Date(Start.date), d = as.Date(Start.date) + (as.Date(End.date) - as.Date(Start.date)) / 2, dmax = as.Date(End.date), 
             ymin = pct(Lower.bound), y = pct(Central.estimate), ymax = pct(Upper.bound))]
     )
@@ -155,16 +115,62 @@ make_data = function(ld, sitreps, virus, sero)
 
 
 # Load fit
-# saved = qread("~/Desktop/uk-fit-nick-2020-11-02.qs")
-# posteriorsI = saved[[1]]
-# dynamicsI = saved[[2]]
-# parametersI = saved[[3]]
-# rm(saved)
+source("./R/latest_fit.R")
 
-saved = qread("./fit_pp24.qs")
-posteriorsI = saved[[1]]
-parametersI = saved[[2]]
-rm(saved)
+# Ensure no undefined parameters
+for (i in seq_along(parametersI)) {
+    if (!is.null(parametersI[[i]])) {
+        parametersI[[i]]$pop[[1]]$dEa = parametersI$pop[[1]]$dE
+        
+        parametersI[[i]]$pop[[1]]$ev = rep(1, 16)
+        parametersI[[i]]$pop[[1]]$ev2 = rep(1, 16)
+        
+        parametersI[[i]]$pop[[1]]$ei_v = rep(1, 16)
+        parametersI[[i]]$pop[[1]]$ed_vi = rep(1, 16)
+
+        parametersI[[i]]$pop[[1]]$ei_v2 = rep(1, 16)
+        parametersI[[i]]$pop[[1]]$ed_vi2 = rep(1, 16)
+        
+        parametersI[[i]]$pop[[1]]$pi_r = rep(1, 16)
+        parametersI[[i]]$pop[[1]]$pd_ri = rep(1, 16)
+        
+        parametersI[[i]]$pop[[1]]$wv = rep(0, 16)
+        parametersI[[i]]$pop[[1]]$wv2 = rep(0, 16)
+        
+        parametersI[[i]]$pop[[1]]$v = rep(0, 16)
+        parametersI[[i]]$pop[[1]]$v12 = rep(0, 16)
+        parametersI[[i]]$pop[[1]]$v2 = rep(0, 16)
+    }
+}
+
+# Health burden processes
+
+# Probability of ICU given hospitalisation (derived from CO-CIN)
+picu_cocin_func = function(age)
+{
+    x = c(-0.1309118, 0, 17.2398874, 65.7016492, 100)
+    y = c(-2.1825091, -2.1407043, -1.3993552, -1.2344361, -8.8191062)
+    p = splinefun(x, y)(age)
+    exp(p) / (1 + exp(p))
+}
+picu_cocin = picu_cocin_func(0:85)
+
+# Infection fatality rate (derived from Levin et al., preprint)
+ifr_levin = 100 * exp(-7.56 + 0.121 * 0:85) / (100 + exp(-7.56 + 0.121 * 0:85)) / 100;
+
+# Infection hospitalisation rate (derived from Salje et al., Science)
+ihr_salje = exp(-7.37 + 0.068 * 0:85) / (1 + exp(-7.37 + 0.068 * 0:85));
+
+# Amalgamate probabilities
+probabilities = data.table(age = 0:85, ihr = ihr_salje, ifr = ifr_levin, picu = picu_cocin)
+probabilities[, age_group := pmin(15, age %/% 5)]
+probabilities = probabilities[, lapply(.SD, mean), by = age_group, .SDcols = 2:4]
+
+# Create model burden processes
+P.hosp     = probabilities[, ihr];
+P.critical = probabilities[, ihr * picu];
+P.severe   = probabilities[, ihr * (1 - picu)];
+P.death    = probabilities[, ifr];
 
 # Recover dynamics
 # TODO this needs to be saved in the qs file above instead of being copied out here.
@@ -251,15 +257,10 @@ cpp_chgI = function()
         '    }',
         '}',
         
-        # old... for fIs changes - overwriting changes in fIs here.
+        # for fIs changes - overwriting changes in fIs here.
         'for (unsigned int i = 0; i < P.changes.ch[1].times.size(); ++i) {',
         '    P.changes.ch[1].values[i] = vector<double>(16, 1.0);',
         '}'
-        
-        # # seasonality
-        # 'P.pop[0].season_phi[0] = 0;',
-        # 'P.pop[0].season_T[0] = 365.25;',
-        # 'P.pop[0].season_A[0] = x[24];'
     )
 }
 
@@ -389,7 +390,10 @@ for (i in seq_along(parametersI)) {
 # Create formatted output
 test = rbindlist(dynamicsI, fill = TRUE)
 test[, population := nhs_regions[population]]
+# Use next line for plotting projections against data
+# test = proj_ldW4o
 output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-10-23")
+# output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-11-30")
 output[, d := make_date(`Year of Value`, `Month of Value`, `Day of Value`)]
 output = merge(output, popsize, by = "Geography")
 
@@ -447,36 +451,25 @@ data[, ValueType := factor(ValueType, levels = c("Deaths", "Admissions", "Hosp b
 
 # Make plot
 theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
-# pop1 = c("East of England", "London", "Midlands")
-# pop2 = c("North East and Yorkshire", "North West", "South East", "South West")
-# 
-# ggplot(output[d > "2020-03-01" & Geography %in% pop1]) +
-#     geom_ribbon(aes(x = d, ymin = `Quantile 0.025` / 1000, ymax = `Quantile 0.975` / 1000, fill = ValueType), alpha = 0.5) +
-#     geom_line(aes(x = d, y = Value / 1000, colour = ValueType)) +
-#     geom_point(data = data[Geography %in% pop1], aes(x = d, y = y / 1000), size = 0.01, shape = 20) +
-#     geom_linerange(data = data[Geography %in% pop1], aes(x = d, ymin = ymin / 1000, ymax = ymax / 1000), size = 0.2) +
-#     geom_linerange(data = data[Geography %in% pop1], aes(xmin = dmin, xmax = dmax, y = y / 1000), size = 0.2) +
-#     facet_grid(ValueType ~ Geography, scales = "free", switch = "y") +
-#     theme(legend.position = "none", strip.placement = "outside") +
-#     labs(x = "Date", y = "Value (thousands)")
-# 
-# ggsave("./figures/fits1.pdf", width = 18, height = 16, units = "cm", useDingbats = F)
-# ggsave("./figures/fits1.png", width = 18, height = 16, units = "cm")
-# 
-# ggplot(output[d > "2020-03-01" & Geography %in% pop2]) +
-#     geom_ribbon(aes(x = d, ymin = `Quantile 0.025` / 1000, ymax = `Quantile 0.975` / 1000, fill = ValueType), alpha = 0.5) +
-#     geom_line(aes(x = d, y = Value / 1000, colour = ValueType)) +
-#     geom_point(data = data[Geography %in% pop2], aes(x = d, y = y / 1000), size = 0.01, shape = 20) +
-#     geom_linerange(data = data[Geography %in% pop2], aes(x = d, ymin = ymin / 1000, ymax = ymax / 1000), size = 0.2) +
-#     geom_linerange(data = data[Geography %in% pop2], aes(xmin = dmin, xmax = dmax, y = y / 1000), size = 0.2) +
-#     facet_grid(ValueType ~ Geography, scales = "free", switch = "y") +
-#     theme(legend.position = "none", strip.placement = "outside") +
-#     labs(x = "Date", y = "Value (thousands)")
-# 
-# ggsave("./figures/fits2.pdf", width = 18, height = 16, units = "cm", useDingbats = F)
-# ggsave("./figures/fits2.png", width = 18, height = 16, units = "cm")
 
 linetypes = c("Deaths", "Admissions", "Hosp beds occupied", "ICU beds occupied")
+
+ggplot(output[d > "2020-09-01"]) +
+    geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`, fill = ValueType), alpha = 0.5) +
+    geom_line(aes(x = d, y = Value, colour = ValueType)) +
+    geom_line(data = data[ValueType %in% linetypes & d > "2020-09-01"], aes(x = d, y = y), size = 0.2) +
+    geom_point(data = data[!ValueType %in% linetypes & d > "2020-09-01"], aes(x = d, y = y), size = 0.01, shape = 20) +
+    geom_linerange(data = data[d > "2020-09-01"], aes(x = d, ymin = ymin, ymax = ymax), size = 0.2) +
+    geom_linerange(data = data[d > "2020-09-01"], aes(xmin = dmin, xmax = dmax, y = y), size = 0.2) +
+    geom_vline(aes(xintercept = ymd("2020-10-14")), size = 0.2, linetype = "42") +
+    facet_grid(ValueType ~ Geography, scales = "free", switch = "y") +
+    theme_cowplot(font_size = 6) +
+    theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
+    labs(x = NULL, y = NULL)
+
+ggsave("./figures/NEW_fits_W.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
+ggsave("./figures/NEW_fits_W.png", width = 18, height = 14, units = "cm")
+
 
 ggplot(output[d > "2020-03-01"]) +
     geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`, fill = ValueType), alpha = 0.5) +
@@ -490,8 +483,8 @@ ggplot(output[d > "2020-03-01"]) +
     theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
     labs(x = NULL, y = NULL)
 
-ggsave("./figures/fits.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
-ggsave("./figures/fits.png", width = 18, height = 14, units = "cm")
+ggsave("./figures/noNHSBT_fits.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
+ggsave("./figures/noNHSBT_fits.png", width = 18, height = 14, units = "cm")
 
 ggplot(output[d > "2020-04-15" & ValueType == "PCR positivity, %"]) +
     geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`), fill = "#6F9AF8", alpha = 0.5) +
@@ -732,13 +725,13 @@ p1 = post_tscatter(posteriorm,
     list("u", "sep_boost"), 
     c("Start of transmission\nand susceptibility", "Late summer\nboost"))
 
-# 4 plots
+# 3 plots
 p2 = post_gammadist(posteriorm, 
-    list(0, 0, 0, 0), 
-    list(30, 30, 30, 30), 
-    list("death_mean", "admission", "icu_admission", "waning"), 
-    list("death_shape", 0.71, 1.91, 1), 
-    c("Delay from infection\nto death", "Delay from infection\nto hospital admission", "Delay from infection\nto ICU admission", "Duration of\nseropositivity"))
+    list(0, 0, 0), 
+    list(30, 30, 30), 
+    list("death_mean", "admission", "icu_admission"), 
+    list("death_shape", 0.71, 1.91), 
+    c("Delay from infection\nto death", "Delay from infection\nto hospital admission", "Delay from infection\nto ICU admission"))
 
 # 3 plots
 p3 = post_asc(posteriorm, 
@@ -750,17 +743,19 @@ p3 = post_asc(posteriorm,
     list("contact_s1", 7.8, "detect_s1"), 
     c("Contact\nmultiplier", "Relative\nfatality rate", "Time to test\nin hospital"))
 
-# 5 plots
+# 8 plots
 p4 = post_hist(posteriorm, 
-    list("hosp_rlo", "icu_rlo", "concentration1", "concentration2", "concentration3"), 
-    c("Relative log-odds\nof hospitalisation", "Relative log-odds\nof ICU admission", "Younger-age\ntransmission, July", "Younger-age\ntransmission, August", "Younger-age\ntransmission, September"))
+    list("nonicu_los", "icu_los", "hosp_rlo", "icu_rlo", 
+        "concentration1", "concentration2", "concentration3", "waning"), 
+    c("Length of\nhospital stay", "Length of\nICU stay", "Relative log-odds\nof hospitalisation", "Relative log-odds\nof ICU admission", 
+        "Younger-age\ntransmission, July", "Younger-age\ntransmission, August", "Younger-age\ntransmission, September", "Duration of\nseropositivity"))
 
 
-cowplot::plot_grid(plotlist = c(p1, p4), ncol = 1, labels = letters, label_size = 10, align = "hv")
+cowplot::plot_grid(plotlist = c(p1, p2, p3), ncol = 1, labels = letters, label_size = 10, align = "hv")
 ggsave("./figures/posteriors1.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors1.png", width = 18, height = 24, units = "cm")
 
-cowplot::plot_grid(plotlist = c(p2, p3), ncol = 1, labels = letters, label_size = 10, align = "hv")
+cowplot::plot_grid(plotlist = p4, ncol = 1, labels = letters, label_size = 10, align = "hv")
 ggsave("./figures/posteriors2.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors2.png", width = 18, height = 24, units = "cm")
 
@@ -809,7 +804,7 @@ m[ValueType == "icu_prev", ValueType := "ICU beds occupied"]
 m[, min_date := min(Date), by = DateStamp]
 m = m[Date <= min_date + 7 * 6]
 
-data2 = fread("~/Dropbox/uk_covid_data/data-2020-11-06.csv")
+data2 = fread("~/Dropbox/uk_covid_data/data-2020-11-27.csv")
 data2 = data2[location %in% c("East of England", "London", "Midlands", "North East and Yorkshire", "North West", "South East", "South West")]
 names(data2)[2] = "Geography"
 names(data2)[3] = "ValueType"
@@ -833,3 +828,146 @@ ggplot(m[Geography == "England"]) +
 
 ggsave("./figures/MTPs.pdf", width = 18, height = 12, units = "cm", useDingbats = FALSE)
 ggsave("./figures/MTPs.png", width = 18, height = 12, units = "cm")
+
+
+
+#
+# Comparison of mobility/tiers to predicted
+#
+
+library(data.table)
+library(ggplot2)
+library(zoo)
+library(mgcv)
+library(lubridate)
+library(stringr)
+library(cowplot)
+library(qs)
+library(ogwrangler)
+
+theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
+
+# Load Google Mobility data and interface with ogwrangler
+gm = qread("./data/google_mobility_uk.qs");
+CreateCache();
+gm[, name := ifelse(sub_region_2 != "", paste0(sub_region_2, ", ", sub_region_1), sub_region_1)];
+gm = gm[name != ""];
+gm_match = data.table(code = ogcode("*", "gmcty"));
+gm_match[, name := ogwhat(code, "name")];
+gm_match[, nhser := ogwhat(code, "nhser")];
+gm_match = gm_match[nhser %like% "^E"];
+gm_match[, nhser_name := ogwhat(nhser)];
+gm_match[, pop := ogwhat(code, "pop2019")];
+
+gm = merge(gm, gm_match, by = "name")
+names(gm) = str_replace_all(names(gm), "_percent_change_from_baseline", "")
+gm = melt(gm, id.vars = c("date", "code", "nhser_name", "pop"), measure.vars = c("retail_and_recreation", "grocery_and_pharmacy", "parks", "transit_stations", "workplaces", "residential"))
+
+gm = gm[, .(value = weighted.mean(value, pop, na.rm = T)), keyby = .(date, nhser_name, variable)]
+gm[, rollval := rollmean(value, 7, fill = NA), by = .(nhser_name, variable)]
+
+# Compare predicted to actual tiering
+tiers = proj_ldW4o[, .(tier = obs0[2]), by = .(run, t, population)]
+
+tiers = tiers[, .(`0` = sum(tier == 0) / .N,
+    `1` = sum(tier == 1) / .N,
+    `2` = sum(tier == 2) / .N,
+    `3` = sum(tier == 3) / .N), by = .(t, population)]
+
+tiers = melt(tiers, id.vars = 1:2, variable.name = "tier", value.name = "frac")
+tiers[, tier := as.numeric(as.character(tier))]
+tiers[, date := ymd("2020-01-01") + t]
+
+# Empirical
+tiers2 = fread("./data/tiers2.txt")
+lads = ogcode("*", "lad")
+lads = lads[lads %like% "^E"]
+measures = data.table(lad = rep(lads, each = 35), date = rep(ymd("2020-10-01") + 0:34, length(lads)))
+measures[, pop := ogwhat(lad, "pop2019")]
+measures[, population := ogwhat(ogwhat(lad, "nhser"))]
+measures = merge(measures, tiers2[, .(lad = ladcd, date, tier)], by = c("lad", "date"), all = TRUE)
+measures[date == "2020-10-01", tier := 0]
+measures[date == "2020-10-14" & is.na(tier), tier := 1]
+measures[, tier := nafill(tier, "locf"), by = .(lad)]
+
+measures = measures[, .(
+    `0` = weighted.mean(tier == 0, pop),
+    `1` = weighted.mean(tier == 1, pop),
+    `2` = weighted.mean(tier == 2, pop),
+    `3` = weighted.mean(tier == 3, pop)), by = .(date, population)]
+
+measures = melt(measures, id.vars = 1:2, variable.name = "tier", value.name = "frac")
+measures[, tier := as.numeric(as.character(tier))]
+
+ggplot() +
+    geom_ribbon(data = measures[date > "2020-10-01" & date < "2020-11-05"],
+        aes(x = date, ymin = tier - frac/3, ymax = tier + frac/3, group = tier, fill = "Actual"), colour = NA) +
+    geom_line(data = tiers[date > "2020-10-01" & date < "2020-11-05" & frac != 0], 
+        aes(x = date, y = tier - frac/3, group = tier, colour = "Projected")) +
+    geom_line(data = tiers[date > "2020-10-01" & date < "2020-11-05" & frac != 0], 
+        aes(x = date, y = tier + frac/3, group = tier, colour = "Projected")) +
+    scale_fill_manual(values = "grey") +
+    scale_colour_manual(values = "red") +
+    facet_wrap(~population) +
+    labs(x = "Date", y = "Tier", fill = NULL, colour = NULL) +
+    theme(legend.position = "bottom")
+
+
+
+# Comparing mobility indices predicted to actual
+get_mobility = function(proj_ldW4o, parametersI)
+{
+    control = proj_ldW4o[, .(tier = obs0[2], ld = obs0[3]), by = .(run, t, population)]
+    control[ld == 1, tier := 0]
+    control[, sched := tier + 1]
+    control[sched == 2, sched := 1]
+    control[, pid := match(population, nhs_regions)]
+    
+    lookup = NULL
+    for (p in unique(control$pid)) {
+        times = parametersI[[p]]$schedule[[1]]$times
+        
+        s1 = matrix(unlist(parametersI[[p]]$schedule[[1]]$values), ncol = 8, byrow = T)
+        s3 = matrix(unlist(parametersI[[p]]$schedule[[3]]$values), ncol = 8, byrow = T)
+        s4 = matrix(unlist(parametersI[[p]]$schedule[[4]]$values), ncol = 8, byrow = T)
+        lookup = rbind(lookup,
+            cbind(t = times, data.table(s1), sched = 1, pid = p),
+            cbind(t = times, data.table(s3), sched = 3, pid = p),
+            cbind(t = times, data.table(s4), sched = 4, pid = p)
+        )
+    }
+    
+    control = merge(control, lookup, by = c("pid", "t", "sched"))
+    names(control)[9:12] = c("workplaces", "grocery_and_pharmacy", "retail_and_recreation", "transit_stations")
+    control[, V1 := NULL]
+    control[, V6 := NULL]
+    control[, V7 := NULL]
+    control[, V8 := NULL]
+    control[, date := ymd(parametersI[[1]]$date0) + t]
+    control = melt(control, id.vars = c("population", "run", "date"), measure.vars = c("workplaces", "grocery_and_pharmacy", "retail_and_recreation", "transit_stations"))
+    names(control)[1] = "nhser_name"
+    control[, value := value * 100 - 100]
+    
+    gm = fread("./data/gm2.txt")
+    names(gm) = c("nhser_name", "variable", "date", "t", "rollval")
+    gm[, rollval := rollval * 100 - 100]
+    gm = gm[!nhser_name %in% c("England", "Northern Ireland", "Scotland", "Wales", "United Kingdom")]
+    
+    ggplot() + 
+        geom_line(data = control[run == 1 & date >= "2020-09-01" & date <= "2020-12-01"], 
+            aes(x = date, y = value, colour = variable), linetype = "41") +
+        geom_line(data = gm[!variable %in% c("residential", "parks") & date >= "2020-09-01" & date <= "2020-12-01"], 
+            aes(x = date, y = rollval, group = variable, colour = variable), size = 0.2) +
+        facet_wrap(~nhser_name)
+}
+
+parametersI = qread("./figures/params_ldW4o.qs");
+get_mobility(proj_ldW4o, parametersI)
+
+parametersI = qread("./figures/params_ldE4o.qs");
+get_mobility(proj_ldE4o, parametersI)
+
+nhs_regions
+parametersI[[1]]$schedule[[1]]$times
+
+

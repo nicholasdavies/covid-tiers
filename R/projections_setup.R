@@ -69,11 +69,13 @@ P.severe   = probabilities[, ihr * (1 - picu)];
 P.death    = probabilities[, ifr];
 
 # create cpp changes
-cpp_chgI = function()
+cpp_chgI = function(cb_days, se)
 {
     c(
         'vector<double> work_curve = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.008, 0.021, 0.033, 0.046, 0.058, 0.071, 0.083, 0.096, 0.108, 0.121, 0.133, 0.146, 0.158, 0.171, 0.183, 0.196, 0.208, 0.221, 0.233, 0.246, 0.258, 0.271, 0.283, 0.296, 0.308, 0.321, 0.334, 0.346, 0.359, 0.371, 0.384, 0.397, 0.41, 0.422, 0.435, 0.448, 0.461, 0.474, 0.487, 0.5, 0.513, 0.526, 0.539, 0.552, 0.566, 0.579, 0.592, 0.606, 0.619, 0.633, 0.646, 0.66, 0.674, 0.687, 0.701, 0.715, 0.729, 0.743, 0.757, 0.771, 0.785, 0.799, 0.813, 0.828, 0.842, 0.856, 0.87, 0.885, 0.899, 0.914, 0.928, 0.942, 0.957, 0.971, 0.986, 1, 1.014, 1.029, 1.043, 1.058, 1.072, 1.087, 1.101, 1.115, 1.13, 1.144, 1.159, 1.173, 1.188, 1.202, 1.216, 1.231, 1.245, 1.26, 1.274, 1.289, 1.303, 1.317, 1.332, 1.346, 1.361 };',
         'vector<double> other_curve = { 0.064, 0.066, 0.067, 0.068, 0.069, 0.071, 0.072, 0.073, 0.075, 0.076, 0.077, 0.078, 0.08, 0.081, 0.082, 0.084, 0.085, 0.086, 0.087, 0.089, 0.09, 0.091, 0.092, 0.094, 0.095, 0.096, 0.098, 0.099, 0.1, 0.101, 0.103, 0.104, 0.105, 0.106, 0.108, 0.109, 0.11, 0.112, 0.113, 0.114, 0.116, 0.118, 0.119, 0.121, 0.123, 0.125, 0.128, 0.13, 0.132, 0.135, 0.137, 0.14, 0.143, 0.146, 0.15, 0.154, 0.159, 0.164, 0.169, 0.175, 0.182, 0.19, 0.198, 0.207, 0.217, 0.228, 0.24, 0.252, 0.266, 0.28, 0.295, 0.31, 0.327, 0.344, 0.361, 0.379, 0.398, 0.418, 0.438, 0.459, 0.48, 0.502, 0.525, 0.549, 0.572, 0.597, 0.621, 0.647, 0.672, 0.698, 0.725, 0.751, 0.778, 0.805, 0.833, 0.86, 0.888, 0.916, 0.944, 0.972, 1, 1.028, 1.056, 1.084, 1.112, 1.14, 1.168, 1.196, 1.224, 1.252, 1.28, 1.308, 1.337, 1.365, 1.393, 1.421, 1.449, 1.477, 1.505, 1.533, 1.561, 1.589, 1.617, 1.645, 1.673, 1.701 };',
+        'vector<double> cb_days = ', cpp_vec(cb_days), ';',
+        'vector<double> se = ', cpp_vec(se), ';',
         'auto interp = [&](double x, vector<double>& curve) {',
         '    if (x < 0) return curve[0];',
         '    if (x >= (curve.size() - 1) * 0.01) return curve.back();',
@@ -131,7 +133,8 @@ cpp_chgI = function()
         'P.changes.ch[5].values[0] = vector<double>(8, x[18]);',
         'P.changes.ch[5].times[0] = x[24];',
 
-        # fitting of google mobility indices
+        # Processing of google mobility indices into contact rates. 0 = regular/lockdown, 2 = tier 2, 3 = tier 3
+        'unsigned int stdnorm_index = 0;',
         'for (unsigned int k : vector<unsigned int> { 0, 2, 3 }) {',
         '    for (unsigned int i = 0; i < P.changes.ch[k].times.size(); ++i) {',
         '        //double resi = P.changes.ch[k].values[i][0];',
@@ -139,6 +142,13 @@ cpp_chgI = function()
         '        double groc = P.changes.ch[k].values[i][2];',
         '        double rtrc = P.changes.ch[k].values[i][3];',
         '        double trns = P.changes.ch[k].values[i][4];',
+        '        if ((k == 0 && cb_days[i] == 1) || k > 0)',
+        '        {',
+        '            wplc += x[stdnorm_index + 25] * se[stdnorm_index * 4 + 0] / 100;',
+        '            groc += x[stdnorm_index + 25] * se[stdnorm_index * 4 + 1] / 100;',
+        '            rtrc += x[stdnorm_index + 25] * se[stdnorm_index * 4 + 2] / 100;',
+        '            trns += x[stdnorm_index + 25] * se[stdnorm_index * 4 + 3] / 100;',
+        '        }',
         '        double othx = rtrc * 0.345 + trns * 0.445 + groc * 0.210;',
         '        double t = P.changes.ch[k].times[i];',
 
@@ -149,6 +159,7 @@ cpp_chgI = function()
         '        double othe = interp(othx, other_curve);',
         '        P.changes.ch[k].values[i] = { home, work, scho, othe, home, work, scho, othe };',
         '    }',
+        '    ++stdnorm_index;',
         '}',
         
         # old... for fIs changes - overwriting changes in fIs here.
@@ -226,18 +237,9 @@ cpp_obsI = function(P.death)
 
 
 # LOAD FITS
-#saved = qread("~/Desktop/uk-fit-nick-2020-11-02.qs")
-# posteriorsI = saved[[1]]
-# dynamicsI = saved[[2]]
-# parametersI = saved[[3]]
-# rm(saved)
+source("./R/latest_fit.R")
 
-saved = qread("./fit_pp15.qs")
-posteriorsI = saved[[1]]
-parametersI = saved[[2]]
-rm(saved)
-
-# Determine population sizes and set new vaccine parameters
+# Determine population sizes and ensure no undefined vaccine parameters
 popsize = NULL
 for (i in seq_along(parametersI)) {
     if (!is.null(parametersI[[i]])) {
@@ -692,20 +694,38 @@ cpp_chgI_close_schools = function(cb_dates, cb_durations)
 }
 
 project = function(popset, tiers = FALSE, tier2 = NULL, tier3 = NULL, 
-    cb_date = NA, cb_duration = 14, lockdown = NULL, close_schools = FALSE, cb_behaviour = "default", 
-    waning_duration = -1, seasonality = 0, n_run = 100, expire = NULL)
+    cb_date = NA, cb_duration = 14, lockdown = NULL, se = rep(0, 12), close_schools = FALSE, cb_behaviour = "default", 
+    waning_duration = -1, seasonality = 0, n_run = 100, expire = NULL, parameters_only = FALSE)
 {
     dynamicsO = list()
+    paramsO = list()
     for (p in popset) {
         # calculate population size
         pop_size = sum(parametersI[[p]]$pop[[1]]$size);
+        
+        # Set parameters for this run . . .
+        paramsI = rlang::duplicate(parametersI[[p]])
+        paramsI$time1 = "2021-03-31";
+        
+        # get lockdown days in schedule1
+        cb_days = rep(0, length(paramsI$schedule[[1]]$times))
+        if (!is.na(cb_date[1])) {
+            for (k in seq_along(cb_date)) {
+                for (i in seq_along(paramsI$schedule[[1]]$values)) {
+                    today = ymd(paramsI$date0) + paramsI$schedule[[1]]$times[i];
+                    if (today %between% c(ymd(cb_date[k]), ymd(cb_date[k]) + rep_len(cb_duration, length(cb_date))[k] - 1)) {
+                        cb_days[i] = 1;
+                    }
+                }
+            }
+        }
         
         # load user defined functions
         cm_source_backend(
             user_defined = list(
                 model_v2 = list(
                     cpp_changes = c(
-                        cpp_chgI(),
+                        cpp_chgI(cb_days, se),
                         if (close_schools) cpp_chgI_close_schools(cb_date, cb_duration) else NULL
                     ),
                     cpp_loglikelihood = "",
@@ -719,10 +739,6 @@ project = function(popset, tiers = FALSE, tier2 = NULL, tier3 = NULL,
                 )
             )
         )
-        
-        # Set parameters for this run . . .
-        paramsI = rlang::duplicate(parametersI[[p]])
-        paramsI$time1 = "2021-03-31";
         
         # Expire mobility changes after date "expire"
         if (!is.null(expire)) {
@@ -778,12 +794,24 @@ project = function(popset, tiers = FALSE, tier2 = NULL, tier3 = NULL,
         )
         
         # Sampling fits
-        test = cm_backend_sample_fit_test(cm_translate_parameters(paramsI), posteriorsI[[p]], n_run, seed = 0);
-
-        test = rbindlist(test)
-        test = test[, population := p]
-        dynamicsO[[p]] = test
+        if (!parameters_only) {
+            postI = rlang::duplicate(posteriorsI[[p]])
+            postI[, stdnorm_ld := rnorm(.N)]
+            postI[, stdnorm_t2 := rnorm(.N)]
+            postI[, stdnorm_t3 := rnorm(.N)]
+            test = cm_backend_sample_fit_test(cm_translate_parameters(paramsI), postI, n_run, seed = 0);
+    
+            test = rbindlist(test)
+            test = test[, population := p]
+            dynamicsO[[p]] = test
+        }
+        
+        paramsO[[p]] = paramsI
         print(p)
+    }
+    
+    if (parameters_only) {
+        return (paramsO)
     }
 
     testX = rbindlist(dynamicsO)
@@ -819,5 +847,127 @@ nicepc = function(x)
     f = function(y) round(y * 100, 0)
     paste0(f(q[2]), "% (", f(q[1]), " - ", f(q[3]), "%)")
 }
+
+combine_R = function(R_ldN4o, R_ldN4c) {
+    R_ldN4 = cbind(R_ldN4o[, 1:3], R_ldN4c[, 3], R_ldN4o[, 4], R_ldN4c[, 4])
+    names(R_ldN4)[c(3,5)] = paste0(names(R_ldN4)[c(3,5)], ", schools open")
+    names(R_ldN4)[c(4,6)] = paste0(names(R_ldN4)[c(4,6)], ", schools closed")
+    R_ldN4
+}
+
+arrs_ld = function(proj) {
+    # group == 1 is Rt, group == 2 is tier, group == 3 is lockdown
+    trace = proj[, .(ld_0 = obs0[3], Rt_0 = obs0[1]), by = .(run, population, t)]
+    trace[, ld_1 := shift(ld_0, -1), by = .(run, population)]
+    trace[, ld_2 := shift(ld_0, -2), by = .(run, population)]
+    trace[, ld_3 := shift(ld_0, -3), by = .(run, population)]
+    trace[, Rt_1 := shift(Rt_0, -1), by = .(run, population)]
+    trace[, Rt_2 := shift(Rt_0, -2), by = .(run, population)]
+    trace[, Rt_3 := shift(Rt_0, -3), by = .(run, population)]
+    
+    lock = rbind(
+        trace[ld_0 == 0 & ld_1 == 0 & ld_2 == 1 & ld_3 == 1, .(Rt_pre = Rt_0, Rt_in = Rt_3, effect = Rt_3 / Rt_0), by = .(run, population)]
+    )
+
+    rbind(
+        lock[, .(population = "England", `Rt pre-lockdown` = niceq(Rt_pre), `Rt in lockdown` = niceq(Rt_in), `Reduction` = nicepc(1 - effect))],
+        lock[, .(`Rt pre-lockdown` = niceq(Rt_pre), `Rt in lockdown` = niceq(Rt_in), `Reduction` = nicepc(1 - effect)), keyby = population]
+    )
+}
+
+arrs_tier = function(proj) {
+    # group == 1 is Rt, group == 2 is tier, group == 3 is lockdown
+    trace = proj[, .(tier_0 = obs0[2], Rt_0 = obs0[1]), by = .(run, population, t)]
+    trace = trace[tier_0 > 0]
+    trace[, tier_1 := shift(tier_0, -1), by = .(run, population)]
+    trace[, tier_2 := shift(tier_0, -2), by = .(run, population)]
+    trace[, tier_3 := shift(tier_0, -3), by = .(run, population)]
+    trace[, Rt_1 := shift(Rt_0, -1), by = .(run, population)]
+    trace[, Rt_2 := shift(Rt_0, -2), by = .(run, population)]
+    trace[, Rt_3 := shift(Rt_0, -3), by = .(run, population)]
+    
+    tier_1_to_2 = rbind(
+        trace[tier_0 == 1 & tier_1 == 1 & tier_2 == 2 & tier_3 == 2, .(effect = Rt_3 / Rt_0), by = .(run, population)],
+        trace[tier_0 == 2 & tier_1 == 2 & tier_2 == 1 & tier_3 == 1, .(effect = Rt_0 / Rt_3), by = .(run, population)]
+    )
+
+    tier_2_to_3 = rbind(
+        trace[tier_0 == 2 & tier_1 == 2 & tier_2 == 3 & tier_3 == 3, .(effect = Rt_3 / Rt_0), by = .(run, population)],
+        trace[tier_0 == 3 & tier_1 == 3 & tier_2 == 2 & tier_3 == 2, .(effect = Rt_0 / Rt_3), by = .(run, population)]
+    )
+    
+    table_t2 = rbind(
+        tier_1_to_2[, .(population = "England", `Tier 1 to Tier 2` = nicepc(1 - effect))],
+        tier_1_to_2[, .(`Tier 1 to Tier 2` = nicepc(1 - effect)), keyby = population]
+    )
+
+    table_t3 = rbind(
+        tier_2_to_3[, .(population = "England", `Tier 2 to Tier 3` = nicepc(1 - effect))],
+        tier_2_to_3[, .(`Tier 2 to Tier 3` = nicepc(1 - effect)), keyby = population]
+    )
+    
+    merge(table_t2, table_t3, by = "population", all = TRUE, sort = FALSE)
+}
+
+plot_indicator = function(series, indicator_name)
+{
+    ggplot(series[indicator == indicator_name]) +
+        geom_pointrange(aes(x = population, ymin = lo, y = mid, ymax = hi, colour = scenario), position = position_dodge(width = 0.8), shape = 20, size = 0.0) +
+        geom_linerange(aes(x = population, ymin = lo, y = mid, ymax = hi, colour = scenario), position = position_dodge(width = 0.8), size = 0.2) +
+        labs(x = NULL, y = indicator_name) + ylim(0, NA)
+}
+
+plot_indicators_england = function(series, indicator_names, y_axis_title, unit = 1, legpos = "none", pal = "Dark2")
+{
+    ggplot(series[population == "England" & indicator %in% indicator_names]) +
+        geom_ribbon(aes(x = scenario, ymin = lo / unit, ymax = hi / unit, fill = indicator, group = indicator), alpha = 0.5) +
+        geom_line(aes(x = scenario, y = mid / unit, colour = indicator, group = indicator), size = 0.2) +
+        labs(x = NULL, y = y_axis_title, fill = NULL, colour = NULL) + ylim(0, NA) +
+        theme(panel.background = element_rect(fill = "#f4f4f4"),
+            panel.grid.major = element_line(colour = "#ffffff", size = 0.2),
+            legend.position = legpos) +
+        scale_color_brewer(aesthetics = c("colour", "fill"), palette = pal)
+}
+
+plot_indicators_england_stack = function(series, indicator_names, y_axis_title, stack_order, legpos = "none", pal = "Set2")
+{
+    ser2 = rlang::duplicate(series[population == "England" & indicator %in% indicator_names])
+    ser2[, indicator := factor(indicator, stack_order)]
+    ser3 = rlang::duplicate(ser2)
+    ser3 = ser3[order(scenario, rev(indicator))]
+    ser3[, lo := lo - mid]
+    ser3[, hi := hi - mid]
+    ser3[, mid := cumsum(mid), by = scenario]
+    ser3[, lo := mid + lo]
+    ser3[, hi := mid + hi]
+
+    ggplot() +
+        geom_area(data = ser2, aes(x = scenario, y = mid, fill = indicator, group = indicator)) +
+        geom_ribbon(data = ser3, aes(x = scenario, ymin = lo, ymax = hi, group = indicator), alpha = 0.25) +
+        labs(x = NULL, y = y_axis_title, fill = NULL, colour = NULL) + ylim(0, NA) +
+        theme(panel.background = element_rect(fill = "#f4f4f4"),
+            panel.grid.major = element_line(colour = "#ffffff", size = 0.2),
+            legend.position = legpos) +
+        scale_color_brewer(aesthetics = c("colour", "fill"), palette = pal)
+}
+
+plot_indicator_regions = function(series, indicator_name, label = indicator_name, suffix = "\n(Thousands)", unit = 1000, legpos = "none", bigtitle = NULL)
+{
+    ser2 = rlang::duplicate(series[population != "England" & indicator == indicator_name])
+    ser2[population == "East of England", population := "EE"]
+    ser2[population == "London", population := "Ldn"]
+    ser2[population == "Midlands", population := "Mlds"]
+    ser2[population == "North East and Yorkshire", population := "NE&Y"]
+    ser2[population == "North West", population := "NW"]
+    ser2[population == "South East", population := "SE"]
+    ser2[population == "South West", population := "SW"]
+    ggplot(ser2) +
+        geom_point(aes(x = population, y = mid / unit, colour = scenario), position = position_dodge(width = 0.8), shape = 20, size = 0.5) +
+        geom_linerange(aes(x = population, ymin = lo / unit, ymax = hi / unit, colour = scenario), position = position_dodge(width = 0.8), size = 0.3) +
+        labs(x = NULL, y = paste0(label, suffix), colour = NULL, title = bigtitle) + 
+        ylim(0, NA) +
+        theme(legend.position = legpos)
+}
+
 
 england_pops = c(1, 3, 4, 5, 6, 9, 10)

@@ -6,15 +6,27 @@ library(lubridate)
 library(stringr)
 library(cowplot)
 library(qs)
+library(ogwrangler)
 
 theme_set(cowplot::theme_cowplot(font_size = 10) + theme(strip.background = element_blank()))
 
-# Load Google Mobility data
-gm = qread("./data/google_mobility_uk.qs")
+# Load Google Mobility data and interface with ogwrangler
+gm = qread("./data/google_mobility_uk.qs");
+CreateCache();
+gm[, name := ifelse(sub_region_2 != "", paste0(sub_region_2, ", ", sub_region_1), sub_region_1)];
+gm = gm[name != ""];
+gm_match = data.table(code = ogcode("*", "gmcty"));
+gm_match[, name := ogwhat(code, "name")];
+gm_match[, rgn := ogwhat(code, "reg")];
+gm_match[, country := str_sub(rgn, 1, 1)];
+gm_match[, rgn := NULL];
+gm_match[, pop2019 := ogwhat(code, "pop2019")];
+gm = merge(gm, gm_match, by = "name");
+gm = gm[, .SD, .SDcols = c(1, 16, 17, 18, 9:15)];
 
 # Other places' lockdowns / circuit breakers
 gm_melt = function(gm) {
-    g = melt(gm, id.vars = 1:8)
+    g = melt(gm, id.vars = 1:5)
     g[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
     return (g)
 }
@@ -22,22 +34,10 @@ gm_melt = function(gm) {
 # Look at Northern Ireland and at Wales.
 
 # Northern Ireland
-ni = c(
-"Antrim and Newtownabbey",
-"Ards and North Down",
-"Armagh City, Banbridge and Craigavon",
-"Belfast",
-"Causeway Coast and Glens",
-"Derry and Strabane",
-"Fermanagh and Omagh",
-"Lisburn and Castlereagh",
-"Mid and East Antrim",
-"Mid Ulster",
-"Newry, Mourne and Down")
-
-gm_ni = gm_melt(gm[country_region_code == "GB" & sub_region_1 %in% ni])
-gm_ni = gm_ni[, .(value = mean(value, na.rm = T)), keyby = .(variable, date)]
+gm_ni = gm_melt(gm[country == "N"])
+gm_ni = gm_ni[, .(value = weighted.mean(value, pop2019, na.rm = T)), keyby = .(variable, date, country)]
 gm_ni[, rollval := rollmean(value, k = 7, fill = "extend"), by = variable]
+gm_ni[, ld_start := ymd("2020-10-17")]; # start of first full day of lockdown
 
 # Plot NI google mobility data
 pl_ni_mob = ggplot(gm_ni) +
@@ -84,14 +84,10 @@ pl_ni = ggplot(compare) +
 
 
 # Wales
-iso3166 = fread("./data/county_iso3166_2_gb.csv")
-
-wales_iso3166 = iso3166[gss_code %like% "^W", unique(iso_code)];
-gm_w = gm[iso_3166_2_code %in% wales_iso3166, lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = 9:14, by = .(date)]
-gm_w = melt(gm_w, id.vars = "date")
-gm_w[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
+gm_w = gm_melt(gm[country == "W"])
+gm_w = gm_w[, .(value = weighted.mean(value, pop2019, na.rm = T)), keyby = .(variable, date, country)]
 gm_w[, rollval := rollmean(value, k = 7, fill = "extend"), by = variable]
-
+gm_ni[, ld_start := ymd("2020-10-24")]; # start of first full day of lockdown
 
 # Plot Wales google mobility data
 pl_w_mob = ggplot(gm_w) + 
@@ -148,13 +144,10 @@ ggsave("./figures/lockdown_analysis.png", width = 18, height = 18, units = "cm")
 
 
 
-# Scotland
-iso3166 = fread("./data/county_iso3166_2_gb.csv")
-
-scot_iso3166 = iso3166[gss_code %like% "^S" & iso_code != "", unique(iso_code)];
-gm_s = gm[iso_3166_2_code %in% scot_iso3166, lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = 9:14, by = .(date)]
-gm_s = melt(gm_s, id.vars = "date")
-gm_s[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
+# Scotland - pub closures, coinciding with half term.
+gm_s = gm_melt(gm[country == "S"])
+gm_s = gm_s[, .(value = weighted.mean(value, pop2019, na.rm = T)), keyby = .(variable, date, country)]
+gm_s[, rollval := rollmean(value, k = 7, fill = "extend"), by = variable]
 
 # Plot Scotland google mobility data
 ggplot(gm_s) + 
@@ -191,29 +184,26 @@ ggplot(compare) +
 
 
 
-# NEW ADDITION 16 Nov 2020: England
+# NEW ADDITION 19 Nov 2020: England
 # England
-iso3166 = fread("./data/county_iso3166_2_gb.csv")
-
-en_iso3166 = iso3166[gss_code %like% "^E", unique(iso_code)];
-gm_e = gm[iso_3166_2_code %in% en_iso3166, lapply(.SD, function(x) mean(x, na.rm = TRUE)), .SDcols = 9:14, by = .(date)]
-gm_e = melt(gm_e, id.vars = "date")
-gm_e[, variable := str_remove_all(variable, "_percent_change_from_baseline")]
+gm_e = gm_melt(gm[country == "E"])
+gm_e = gm_e[, .(value = weighted.mean(value, pop2019, na.rm = T)), keyby = .(variable, date, country)]
 gm_e[, rollval := rollmean(value, k = 7, fill = "extend"), by = variable]
-
+gm_ni[, ld_start := ymd("2020-11-05")]; # start of first full day of lockdown
 
 # Plot England google mobility data
-pl_e_mob = ggplot(gm_e) + 
-    geom_line(aes(x = date, y = value, colour = variable)) +
+pl_e_mob = ggplot(gm_e) +
+    geom_line(aes(x = date, y = rollval, colour = variable)) +
     geom_vline(aes(xintercept = ymd("2020-11-05")), linetype = "22", size = 0.3) +
     facet_wrap(~variable) +
     theme(legend.position = "none") +
     labs(x = "Date", y = "Rolling mean - England")
 
 # Compare post-lockdown values to pre-lockdown values (2 week lookback)
-compare = gm_e[date %between% c(ymd("2020-11-05", "2020-11-13"))]
+# TODO half term will mess this up
+compare = gm_e[date %between% c(ymd("2020-11-05", "2020-11-18"))]
 compare = merge(compare,
-    gm_e[date %between% c(ymd("2020-11-05", "2020-11-13") - 21), 
+    gm_e[date %between% c(ymd("2020-11-05", "2020-11-18") - 21), 
         .(date = date + 21, variable, baseline = value)],
     by = c("date", "variable"))
 compare = compare[order(date, variable)]
@@ -225,23 +215,27 @@ compare[, variable := factor(variable)]
 
 summary = compare[, mean(change), by = variable]
 
-
 # IMPACT OF LOCKDOWN FOR ENGLAND:
 #                 variable         V1
+# 1:  grocery_and_pharmacy  -5.974167
+# 2:                 parks -17.984253
+# 3:           residential   4.838147
+# 4: retail_and_recreation -29.761223
+# 5:      transit_stations -13.910339
+# 6:            workplaces  -8.245860
 
 # Visual comparison
-pl_e = ggplot(compare) +
+ggplot(compare) +
     geom_hline(aes(yintercept = 0), linetype = "23") + 
     geom_point(aes(x = date, y = change)) + 
     geom_smooth(aes(x = date, y = change), method = "lm", formula = y ~ 1) + 
-    geom_label(data = summary, aes(x = ymd("2020-11-07") + 0.5, y = -10, 
+    geom_label(data = summary, aes(x = ymd("2020-11-11") + 0.5, y = -32, 
         label = paste0(ifelse(V1 > 0, "+", ""), round(V1, 2))), alpha = 0.75) +
     facet_wrap(~variable) +
     labs(x = "Date", y = "Change in Google Mobility index")
 
-cowplot::plot_grid(pl_ni_mob, pl_ni, pl_w_mob, pl_w, nrow = 2, labels = letters, label_size = 10)
-ggsave("./figures/lockdown_analysis_2.png", width = 24, height = 18, units = "cm")
-ggsave("./figures/lockdown_analysis_2.pdf", width = 24, height = 18, units = "cm", useDingbats = F)
+
+
 
 
 summ_all = cbind(summaryN, summaryW[, 2], summary[, 2])
