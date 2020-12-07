@@ -3,11 +3,15 @@ source("./R/projections_setup.R")
 source("./R/define_tiers.R")
 
 
-# RUN PROJECTIONS
-
 # get ldW4o parameters
 params_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13", parameters_only = TRUE)
 qsave(params_ldW4o, "./figures/params_ldW4o.qs")
+# get ldE4o parameters
+params_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13", parameters_only = TRUE)
+qsave(params_ldE4o, "./figures/params_ldE4o.qs")
+
+
+# RUN PROJECTIONS
 
 # ldN4o = lockdown, like Northern Ireland, 4 weeks, schools open
 proj_basic = project(england_pops, tiers = FALSE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,                  close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
@@ -16,6 +20,9 @@ proj_ldN4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, 
 proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
 proj_ldN4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
 proj_ldW4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
+
+#plot_projection(list(proj_basic), list("No tiers"), "2020-10-01", "Dark2")
+#plot_projection(list(proj_basic, proj_tiers, proj_ldW4o), list("No tiers", "Tiers", "Wales lockdown, schools open"), "2020-10-01", "Dark2")
 
 plot_projection(list(proj_basic, proj_tiers), list("No tiers", "Tiers"), "2020-10-01", "Dark2")
 ggsave("./figures/proj_tiers.png", width = 24, height = 12, units = "cm")
@@ -231,7 +238,7 @@ p8 = plot_indicators_england_stack(series_weeks, c(
 
 theme_set(theme_cowplot(font_size = 6))
 pp2 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
-ggsave("./figures/big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
+ggsave("./figures/newnew_big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
 
 
 # Comparative plots: Timing of lockdown
@@ -281,9 +288,6 @@ ggsave("./figures/big.png", pp, width = 21, height = 12, units = "cm")
 # New 29 Nov 2020 - England lockdown
 # RUN PROJECTIONS
 
-# get ldE4o parameters
-params_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13", parameters_only = TRUE)
-qsave(params_ldE4o, "./figures/params_ldE4o.qs")
 
 # ldN4o = lockdown, like Northern Ireland, 4 weeks, schools open
 #proj_basic = project(england_pops, tiers = FALSE, tier2 = tier2, tier3 = tier3, cb_date = NA,           cb_duration = NA, lockdown = NA,                  close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")

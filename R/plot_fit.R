@@ -32,24 +32,27 @@ source("~/Documents/covidm_MTPs/spim_output.R");
 #
 
 nhs_regions = popUK[, unique(name)]
-all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-10-23.qs")
+all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-10-23-fix.qs")
 # for more recent data:
-# all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-11-27.qs")
+# all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-11-27-new.qs")
 ld = all_data[[1]]
 sitreps = all_data[[2]]
 virus = all_data[[3]]
 sero = all_data[[4]]
 
-
 # SUMMARISING FUNCS
-output_1var = function(summ, varname, outname, cyear, cmonth, cday, ymd_from, ymd_to)
+output_1var = function(summ, varname, outname, cyear, cmonth, cday, ymd_from, ymd_to, nbinom = TRUE)
 {
     quants = c(0.025, 0.5, 0.975)
 
     # new code...
     rq = data.table(run = 1:summ[, max(run)], q = runif(summ[, max(run)]))
     summ = merge(summ, rq, by = "run")
-    summ[, rv := qnbinom(q, size = 20, mu = get(varname))]
+    if (nbinom) {
+        summ[, rv := qnbinom(q, size = 20, mu = get(varname))]
+    } else {
+        summ[, rv := qnorm(q, mean = get(varname), sd = 1e-12)]
+    }
     qsumm = summ[, as.list(quantile(rv, quants)), by = .(t, population)]
 
     qsumm[, date := t + ymd("2020-01-01")]
@@ -83,9 +86,9 @@ output_full = function(test, cyear, cmonth, cday, ymd_from, ymd_to)
         output_1var(summ3, "icu_p", "icu_prev", cyear, cmonth, cday, ymd_from, ymd_to),
         output_1var(summ4, "bed_p", "hospital_prev", cyear, cmonth, cday, ymd_from, ymd_to),
         output_1var(summ34, "admissions", "hospital_inc", cyear, cmonth, cday, ymd_from, ymd_to),
-        output_1var(summ_pcr_p, "pcr_p", "pcr_prev", cyear, cmonth, cday, ymd_from, ymd_to),
-        output_1var(summ_sero_p, "sero_p", "sero_prev", cyear, cmonth, cday, ymd_from, ymd_to),
-        output_1var(summ_attackrate, "attackrate", "attackrate", cyear, cmonth, cday, ymd_from, ymd_to)
+        output_1var(summ_pcr_p, "pcr_p", "pcr_prev", cyear, cmonth, cday, ymd_from, ymd_to, FALSE),
+        output_1var(summ_sero_p, "sero_p", "sero_prev", cyear, cmonth, cday, ymd_from, ymd_to, FALSE),
+        output_1var(summ_attackrate, "attackrate", "attackrate", cyear, cmonth, cday, ymd_from, ymd_to, FALSE)
     )
     return (w)
 }
@@ -172,172 +175,9 @@ P.critical = probabilities[, ihr * picu];
 P.severe   = probabilities[, ihr * (1 - picu)];
 P.death    = probabilities[, ifr];
 
+source("./R/cpp_funcs.R")
+
 # Recover dynamics
-# TODO this needs to be saved in the qs file above instead of being copied out here.
-# create cpp changes
-cpp_chgI = function()
-{
-    c(
-        'vector<double> work_curve = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.008, 0.021, 0.033, 0.046, 0.058, 0.071, 0.083, 0.096, 0.108, 0.121, 0.133, 0.146, 0.158, 0.171, 0.183, 0.196, 0.208, 0.221, 0.233, 0.246, 0.258, 0.271, 0.283, 0.296, 0.308, 0.321, 0.334, 0.346, 0.359, 0.371, 0.384, 0.397, 0.41, 0.422, 0.435, 0.448, 0.461, 0.474, 0.487, 0.5, 0.513, 0.526, 0.539, 0.552, 0.566, 0.579, 0.592, 0.606, 0.619, 0.633, 0.646, 0.66, 0.674, 0.687, 0.701, 0.715, 0.729, 0.743, 0.757, 0.771, 0.785, 0.799, 0.813, 0.828, 0.842, 0.856, 0.87, 0.885, 0.899, 0.914, 0.928, 0.942, 0.957, 0.971, 0.986, 1, 1.014, 1.029, 1.043, 1.058, 1.072, 1.087, 1.101, 1.115, 1.13, 1.144, 1.159, 1.173, 1.188, 1.202, 1.216, 1.231, 1.245, 1.26, 1.274, 1.289, 1.303, 1.317, 1.332, 1.346, 1.361 };',
-        'vector<double> other_curve = { 0.064, 0.066, 0.067, 0.068, 0.069, 0.071, 0.072, 0.073, 0.075, 0.076, 0.077, 0.078, 0.08, 0.081, 0.082, 0.084, 0.085, 0.086, 0.087, 0.089, 0.09, 0.091, 0.092, 0.094, 0.095, 0.096, 0.098, 0.099, 0.1, 0.101, 0.103, 0.104, 0.105, 0.106, 0.108, 0.109, 0.11, 0.112, 0.113, 0.114, 0.116, 0.118, 0.119, 0.121, 0.123, 0.125, 0.128, 0.13, 0.132, 0.135, 0.137, 0.14, 0.143, 0.146, 0.15, 0.154, 0.159, 0.164, 0.169, 0.175, 0.182, 0.19, 0.198, 0.207, 0.217, 0.228, 0.24, 0.252, 0.266, 0.28, 0.295, 0.31, 0.327, 0.344, 0.361, 0.379, 0.398, 0.418, 0.438, 0.459, 0.48, 0.502, 0.525, 0.549, 0.572, 0.597, 0.621, 0.647, 0.672, 0.698, 0.725, 0.751, 0.778, 0.805, 0.833, 0.86, 0.888, 0.916, 0.944, 0.972, 1, 1.028, 1.056, 1.084, 1.112, 1.14, 1.168, 1.196, 1.224, 1.252, 1.28, 1.308, 1.337, 1.365, 1.393, 1.421, 1.449, 1.477, 1.505, 1.533, 1.561, 1.589, 1.617, 1.645, 1.673, 1.701 };',
-        'auto interp = [&](double x, vector<double>& curve) {',
-        '    if (x < 0) return curve[0];',
-        '    if (x >= (curve.size() - 1) * 0.01) return curve.back();',
-        '    unsigned int i = (unsigned int)(x * 100);',
-        '    double f = x * 100 - i;',
-        '    return f * curve[i] + (1 - f) * curve[i + 1];',
-        '};',
-        
-        'auto odds = [&](double x, double lo) {',
-        '    double a = x / (1 - x);',
-        '    return a * exp(lo) / (a * exp(lo) + 1);',
-        '};',
-
-        'for (unsigned int g = 0; g < P.processes[0].prob.size(); ++g) {',
-        '    // To hospital',
-        '    P.processes[0].prob[g][0] = odds(P.processes[0].prob[g][0], x[7]);',
-        '    P.processes[0].prob[g][1] = 1 - P.processes[0].prob[g][0];',
-        '    // To ICU',
-        '    P.processes[1].prob[g][0] = odds(P.processes[1].prob[g][0], x[7] + x[6]);',
-        '    P.processes[1].prob[g][1] = 1 - P.processes[1].prob[g][0];',
-        '    // To death',
-        '    P.processes[4].prob[g][0] = min(1.0, P.processes[4].prob[g][0] * x[5]);',
-        '    P.processes[4].prob[g][1] = 1 - P.processes[4].prob[g][0];',
-        '    // Relative susceptibility',
-        '    P.pop[0].u[g] = P.pop[0].u[g] * x[1];',
-        '}',
-
-        '// Delays to admission to hospital & ICU',
-        'P.processes[0].delays[0] = delay_gamma(x[4], 0.71, 60, 0.25);',
-        'P.processes[1].delays[1] = delay_gamma(x[10], 1.91, 60, 0.25);',
-        '// Lengths of stay',
-        'P.processes[2].delays[0] = delay_lnorm(x[9], 1.35, 60, 0.25);',
-        'P.processes[3].delays[0] = delay_lnorm(x[8], 1.31, 60, 0.25);',
-        '// Death',
-        'P.processes[4].delays[0] = delay_gamma(x[2], x[3], 60, 0.25);',
-        '// Waning of antibodies',
-        'P.processes[6].delays[0] = delay_gamma(x[14], 1, 730, 0.25);',
-        'P.pop[0].rho = vector<double>(P.pop[0].rho.size(), 1);',
-        'P.pop[0].seed_times = seq((int)x[0], (int)x[0] + 27);',
-
-        'auto asc = [&](double x, double y0, double y1, double s0, double s1) {',
-        '    double xx = s0 + x * (s1 - s0);',
-        '    double h0 = exp(s0) / (1 + exp(s0));',
-        '    double h1 = exp(s1) / (1 + exp(s1));',
-        '    double h = (exp(xx) / (1 + exp(xx)) - h0) / (h1 - h0);',
-        '    return y0 + (y1 - y0) * h;',
-        '};',
-
-        'for (unsigned int i = 0; i < P.changes.ch[4].times.size(); ++i) {',
-        '    double tx = double(i) / (P.changes.ch[4].times.size() - 1.0);',
-        '    P.changes.ch[4].values[i] = vector<double>(8, asc(tx, 1.0, x[11], -x[12], x[13]));',
-        '}',
-
-        # Sep boost
-        'P.changes.ch[5].values[0] = vector<double>(8, x[18]);',
-        'P.changes.ch[5].times[0] = x[24];',
-
-        # fitting of google mobility indices
-        'for (unsigned int k : vector<unsigned int> { 0, 2, 3 }) {',
-        '    for (unsigned int i = 0; i < P.changes.ch[k].times.size(); ++i) {',
-        '        //double resi = P.changes.ch[k].values[i][0];',
-        '        double wplc = P.changes.ch[k].values[i][1];',
-        '        double groc = P.changes.ch[k].values[i][2];',
-        '        double rtrc = P.changes.ch[k].values[i][3];',
-        '        double trns = P.changes.ch[k].values[i][4];',
-        '        double othx = rtrc * 0.345 + trns * 0.445 + groc * 0.210;',
-        '        double t = P.changes.ch[k].times[i];',
-
-        # from CoMix analysis
-        '        double home = asc(min(1.0, t / 365.0), 1.0, 1.545019 / 3.875622, -79 * 0.6, 286 * 0.6);',
-        '        double work = interp(wplc, work_curve);',
-        '        double scho = (t >= 81 || t <= 244) ? 0 : 1;',
-        '        double othe = interp(othx, other_curve);',
-        '        P.changes.ch[k].values[i] = { home, work, scho, othe, home, work, scho, othe };',
-        '    }',
-        '}',
-        
-        # for fIs changes - overwriting changes in fIs here.
-        'for (unsigned int i = 0; i < P.changes.ch[1].times.size(); ++i) {',
-        '    P.changes.ch[1].values[i] = vector<double>(16, 1.0);',
-        '}'
-    )
-}
-
-
-# Observer function (basic)
-cpp_obsI = function(P.death)
-{
-    c(
-        'auto asc = [&](double x, double y0, double y1, double s0, double s1) {',
-        '    double xx = s0 + x * (s1 - s0);',
-        '    double h0 = exp(s0) / (1 + exp(s0));',
-        '    double h1 = exp(s1) / (1 + exp(s1));',
-        '    double h = (exp(xx) / (1 + exp(xx)) - h0) / (h1 - h0);',
-        '    return y0 + (y1 - y0) * h;',
-        '};',
-
-        'dyn.Obs(t, 0, 0, 0) = estimate_Rt(P, dyn, t, 0, 50);',
-        'dyn.Obs(t, 0, 3, 0) = estimate_R0(P, t, 0, 50);',
-        # # pressure month
-        # 'if (t == 80 /*(int)x[11]*/) {',
-        # '    P.processes[1].delays[0] = delay_gamma(x[8] * x[10], 3, 60, 0.25);',
-        # '    P.processes[2].delays[0] = delay_gamma(x[9] * x[10], 3, 60, 0.25);',
-        # '} else if (t == 80 + 30 /*(int)x[11] + (int)x[12]*/) {',
-        # '    P.processes[1].delays[0] = delay_gamma(x[8], 3, 60, 0.25);',
-        # '    P.processes[2].delays[0] = delay_gamma(x[9], 3, 60, 0.25);',
-        # '}',
-        # increase in young person mobility
-        'if (t == 182) {',
-        '    double mode = 0.2;',
-        '    double conc = x[15];',
-        '    double constant = 0.2;',
-        '    for (unsigned int a = 0; a < P.pop[0].u.size(); ++a)',
-        '        P.pop[0].u[a] *= (1 - constant) * dbeta((a + 0.5) / P.pop[0].u.size(), mode * (conc - 2) + 1, (1 - mode) * (conc - 2) + 1) + constant;',
-        '}',
-        'if (t == 213) {',
-        '    double mode = 0.2;',
-        '    double conc_prev = x[15];',
-        '    double conc = x[16];',
-        '    double constant = 0.2;',
-        '    for (unsigned int a = 0; a < P.pop[0].u.size(); ++a) {',
-        '        P.pop[0].u[a] /= (1 - constant) * dbeta((a + 0.5) / P.pop[0].u.size(), mode * (conc_prev - 2) + 1, (1 - mode) * (conc_prev - 2) + 1) + constant;',
-        '        P.pop[0].u[a] *= (1 - constant) * dbeta((a + 0.5) / P.pop[0].u.size(), mode * (conc - 2) + 1, (1 - mode) * (conc - 2) + 1) + constant;',
-        '    }',
-        '}',
-        'if (t == 244) {',
-        '    double mode = 0.2;',
-        '    double conc_prev = x[16];',
-        '    double conc = x[17];',
-        '    double constant = 0.2;',
-        '    for (unsigned int a = 0; a < P.pop[0].u.size(); ++a) {',
-        '        P.pop[0].u[a] /= (1 - constant) * dbeta((a + 0.5) / P.pop[0].u.size(), mode * (conc_prev - 2) + 1, (1 - mode) * (conc_prev - 2) + 1) + constant;',
-        '        P.pop[0].u[a] *= (1 - constant) * dbeta((a + 0.5) / P.pop[0].u.size(), mode * (conc - 2) + 1, (1 - mode) * (conc - 2) + 1) + constant;',
-        '    }',
-        '}',
-        # changing CFR
-        'if ((int)t % 7 == 0) {',
-        '    double ifr_table[] = {', paste(P.death, collapse = ", "), '};',
-        '    for (unsigned int g = 0; g < P.processes[0].prob.size(); ++g) {',
-        '        double ifr = ifr_table[g];',
-        '        P.processes[4].prob[g][0] = asc(min(365.0, t/365.0), ifr * x[5], ifr * x[5] * x[19], -2.9, 7.8);',
-        '        P.processes[4].prob[g][1] = 1 - P.processes[3].prob[g][0];',
-        '    }',
-        '}',
-        # changing detection rate in patients admitted to hospital
-        'double detection = asc(min(t / 365.0, 1.0), x[20], x[21], -x[22], x[23]);',
-        'P.processes[7].delays[0] = delay_gamma(detection, 0.59, 60, 0.25);'
-        
-        # # test - susceptibility of children as norm
-        # 'if (t == 244) {',
-        # '    P.pop[0].u[0] = P.pop[0].u[4];',
-        # '    P.pop[0].u[1] = P.pop[0].u[4];',
-        # '    P.pop[0].u[2] = P.pop[0].u[4];',
-        # '    P.pop[0].u[3] = P.pop[0].u[4];',
-        # '}'
-    )
-
-}
 
 
 # Loop through regions of England
@@ -357,7 +197,8 @@ for (p in c(1,3,4,5,6,9,10))  {
     # Sampling fits
     paramsI2 = rlang::duplicate(parametersI[[p]])
     paramsI2$time1 = as.character(ymd(paramsI2$time1) + 56);
-    test = cm_backend_sample_fit_test(cm_translate_parameters(paramsI2), posteriorsI[[p]], 500, seed = 0);
+    test = cm_backend_sample_fit_test(cm_translate_parameters(paramsI2), posteriorsI[[p]], 50, seed = 0);
+    warning("50 fits only.")
 
     test = rbindlist(test)
     test = test[, population := p]
@@ -391,7 +232,7 @@ for (i in seq_along(parametersI)) {
 test = rbindlist(dynamicsI, fill = TRUE)
 test[, population := nhs_regions[population]]
 # Use next line for plotting projections against data
-# test = proj_ldW4o
+# test = proj_ldE4o
 output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-10-23")
 # output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-11-30")
 output[, d := make_date(`Year of Value`, `Month of Value`, `Day of Value`)]
@@ -467,8 +308,8 @@ ggplot(output[d > "2020-09-01"]) +
     theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
     labs(x = NULL, y = NULL)
 
-ggsave("./figures/NEW_fits_W.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
-ggsave("./figures/NEW_fits_W.png", width = 18, height = 14, units = "cm")
+ggsave("./figures/forward_fits_E.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
+ggsave("./figures/forward_fits_E.png", width = 18, height = 14, units = "cm")
 
 
 ggplot(output[d > "2020-03-01"]) +
@@ -483,8 +324,8 @@ ggplot(output[d > "2020-03-01"]) +
     theme(legend.position = "none", strip.placement = "outside", strip.background = element_blank()) +
     labs(x = NULL, y = NULL)
 
-ggsave("./figures/noNHSBT_fits.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
-ggsave("./figures/noNHSBT_fits.png", width = 18, height = 14, units = "cm")
+ggsave("./figures/fits.pdf", width = 18, height = 14, units = "cm", useDingbats = F)
+ggsave("./figures/fits.png", width = 18, height = 14, units = "cm")
 
 ggplot(output[d > "2020-04-15" & ValueType == "PCR positivity, %"]) +
     geom_ribbon(aes(x = d, ymin = `Quantile 0.025`, ymax = `Quantile 0.975`), fill = "#6F9AF8", alpha = 0.5) +
@@ -518,7 +359,8 @@ posterior = rbindlist(posteriorsI, fill = TRUE)
 posteriorm = melt(posterior[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 
     id.vars = c("trial", "lp", "chain", "ll", "population"))
 posteriorm = posteriorm[!is.na(value)]
-# make sure it is in order...
+
+ggplot(posteriorm) + geom_density(aes(x = value, colour = population)) + facet_wrap(~variable, scales = "free")
 
 # Add final CFR to posteriorm -- cfr_rel2 is multiplied by cfr_rel to get final CFR.
 cfr_final = posteriorm[variable == "cfr_rel2"]
