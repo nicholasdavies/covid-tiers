@@ -34,7 +34,7 @@ source("~/Documents/covidm_MTPs/spim_output.R");
 nhs_regions = popUK[, unique(name)]
 all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-10-23-fix.qs")
 # for more recent data:
-# all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-11-27-new.qs")
+# all_data = qread("~/Dropbox/uk_covid_data/processed-data-2020-12-07.qs")
 ld = all_data[[1]]
 sitreps = all_data[[2]]
 virus = all_data[[3]]
@@ -234,7 +234,7 @@ test[, population := nhs_regions[population]]
 # Use next line for plotting projections against data
 # test = proj_ldE4o
 output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-10-23")
-# output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-11-30")
+# output = output_full(test[!population %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")], 2020, 11, 1, "2020-01-01", "2020-12-07")
 output[, d := make_date(`Year of Value`, `Month of Value`, `Day of Value`)]
 output = merge(output, popsize, by = "Geography")
 
@@ -254,7 +254,7 @@ adj_output(output, "type28_death_inc_line", 1)
 adj_output(output, "attackrate", 0, 0.01)
 
 # Make data to output
-data = make_data(ld, sitreps, virus, sero)[!Geography %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")]
+data = make_data(ld, sitreps, virus[!Data.source %like% "7a|7b|6a|6b|unweighted"], sero)[!Geography %in% c("England", "United Kingdom", "Wales", "Scotland", "Northern Ireland")]
 data = merge(data, popsize, by = "Geography")
 
 adj_data = function(data, val_type, div, pop = 0) {
@@ -575,29 +575,32 @@ p2 = post_gammadist(posteriorm,
     list("death_shape", 0.71, 1.91), 
     c("Delay from infection\nto death", "Delay from infection\nto hospital admission", "Delay from infection\nto ICU admission"))
 
-# 3 plots
+# 2 plots
 p3 = post_asc(posteriorm, 
-    list(ymd("2020-01-01"), ymd("2020-01-01"), ymd("2020-01-01")), 
-    list(ymd("2020-12-31"), ymd("2020-12-31"), ymd("2020-12-31")), 
-    list(1, "cfr_rel", "detect1"), 
-    list("contact_final", "cfr_final", "detect2"), 
-    list("contact_s0", 2.9, "detect_s0"), 
-    list("contact_s1", 7.8, "detect_s1"), 
-    c("Contact\nmultiplier", "Relative\nfatality rate", "Time to test\nin hospital"))
+    list(ymd("2020-01-01"), ymd("2020-01-01")), 
+    list(ymd("2020-12-31"), ymd("2020-12-31")), 
+    list(1, "cfr_rel"), 
+    list("contact_final", "cfr_final"), 
+    list("contact_s0", 2.9), 
+    list("contact_s1", 7.8), 
+    c("Contact\nmultiplier", "Relative\nfatality rate"))
 
-# 8 plots
+# 2 plots
 p4 = post_hist(posteriorm, 
-    list("nonicu_los", "icu_los", "hosp_rlo", "icu_rlo", 
-        "concentration1", "concentration2", "concentration3", "waning"), 
-    c("Length of\nhospital stay", "Length of\nICU stay", "Relative log-odds\nof hospitalisation", "Relative log-odds\nof ICU admission", 
-        "Younger-age\ntransmission, July", "Younger-age\ntransmission, August", "Younger-age\ntransmission, September", "Duration of\nseropositivity"))
+    list("hosp_rlo", "icu_rlo"), 
+    c("Relative log-odds\nof hospitalisation", "Relative log-odds\nof ICU admission"))
+
+# 3 plots
+p5 = post_hist(posteriorm, 
+    list("concentration1", "concentration2", "concentration3"), 
+    c("Younger-age\ntransmission, July", "Younger-age\ntransmission, August", "Younger-age\ntransmission, September"))
 
 
-cowplot::plot_grid(plotlist = c(p1, p2, p3), ncol = 1, labels = letters, label_size = 10, align = "hv")
+cowplot::plot_grid(plotlist = c(p1, p3, p4), ncol = 1, labels = letters, label_size = 10, align = "hv")
 ggsave("./figures/posteriors1.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors1.png", width = 18, height = 24, units = "cm")
 
-cowplot::plot_grid(plotlist = p4, ncol = 1, labels = letters, label_size = 10, align = "hv")
+cowplot::plot_grid(plotlist = c(p2, p5), ncol = 1, labels = letters, label_size = 10, align = "hv")
 ggsave("./figures/posteriors2.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors2.png", width = 18, height = 24, units = "cm")
 
@@ -606,14 +609,14 @@ ggsave("./figures/posteriors2.png", width = 18, height = 24, units = "cm")
 # PLAIN HISTOGRAM STYLE POSTERIORS
 theme_set(cowplot::theme_cowplot(font_size = 6) + theme(strip.background = element_blank()))
 variables = posteriorm[, unique(variable)];
-ggplot(posteriorm[variable %in% variables[1:12]]) +
+ggplot(posteriorm[variable %in% variables[1:9]]) +
     geom_histogram(aes(x = value, y = after_stat(density))) +
     facet_wrap(variable ~ population, scales = "free", ncol = 7) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
 ggsave("./figures/posteriors_hist1.pdf", width = 18, height = 24, units = "cm", useDingbats = FALSE)
 ggsave("./figures/posteriors_hist1.png", width = 18, height = 24, units = "cm")
 
-ggplot(posteriorm[variable %in% variables[13:26] & variable != "cfr_final"]) +
+ggplot(posteriorm[variable %in% variables[10:18] & variable != "cfr_final"]) +
     geom_histogram(aes(x = value, y = after_stat(density))) +
     facet_wrap(variable ~ population, scales = "free", ncol = 7) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
@@ -753,6 +756,9 @@ ggplot() +
     facet_wrap(~population) +
     labs(x = "Date", y = "Tier", fill = NULL, colour = NULL) +
     theme(legend.position = "bottom")
+ggsave("./figures/tiers_comparison.pdf", width = 18, height = 10, units = "cm", useDingbats = FALSE)
+ggsave("./figures/tiers_comparison.png", width = 18, height = 10, units = "cm")
+
 
 
 
@@ -808,6 +814,9 @@ get_mobility(proj_ldW4o, parametersI)
 
 parametersI = qread("./figures/params_ldE4o.qs");
 get_mobility(proj_ldE4o, parametersI)
+ggsave("./figures/lockdown_comparison.pdf", width = 18, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/lockdown_comparison.png", width = 18, height = 12, units = "cm")
+
 
 nhs_regions
 parametersI[[1]]$schedule[[1]]$times

@@ -21,8 +21,8 @@ proj_ldW4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, 
 proj_ldN4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownN, se = seN, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
 proj_ldW4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownW, se = seW, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
 
-#plot_projection(list(proj_basic), list("No tiers"), "2020-10-01", "Dark2")
-#plot_projection(list(proj_basic, proj_tiers, proj_ldW4o), list("No tiers", "Tiers", "Wales lockdown, schools open"), "2020-10-01", "Dark2")
+# total infected
+proj_basic[t == 455, nicepc(1 - sum(S)/sum(S+E+Ip+Is+Ia+R)), by = .(population)]
 
 plot_projection(list(proj_basic, proj_tiers), list("No tiers", "Tiers"), "2020-10-01", "Dark2")
 ggsave("./figures/proj_tiers.png", width = 24, height = 12, units = "cm")
@@ -91,6 +91,12 @@ tbWo = summarize_projection(proj_ldW4o, "2020-10-01", popsize)
 fwrite(tbWo, "./figures/proj_ldW4o.csv");
 tbWc = summarize_projection(proj_ldW4c, "2020-10-01", popsize)
 fwrite(tbWc, "./figures/proj_ldW4c.csv");
+
+tbEo = summarize_projection(proj_ldE4o, "2020-10-01", popsize)
+fwrite(tbEo, "./figures/proj_ldE4o.csv");
+tbEc = summarize_projection(proj_ldE4c, "2020-10-01", popsize)
+fwrite(tbEc, "./figures/proj_ldE4c.csv");
+
 
 tbEngland = england_only(list(tbBa, tbTi, tbNo, tbNc, tbWo, tbWc), 
     c("Baseline", "Tiers only", "NI-style lockdown, schools open", "NI-style lockdown, schools closed", "Wales-style lockdown, schools open", "Wales-style lockdown, schools closed"))
@@ -206,7 +212,7 @@ ggsave("./figures/regional.png", ppr, width = 21, height = 21, units = "cm")
 # Comparative plots: Type of intervention
 p0 = plot_cum_deaths(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c), 
     c("Baseline", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c"), 
-    "2020-10-01", ystart = 28, ydiff = -2.1, titl = "Type of intervention")
+    "2020-10-01", ystart = 52, ydiff = -3.7, titl = "Type of intervention")
 p1 = plot_icu(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c), 
     c("Baseline", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c"), 
     "2020-10-01")
@@ -225,7 +231,7 @@ ggsave("./figures/big_what.pdf", pp1, width = 7, height = 12, units = "cm")
 # Comparative plots: Duration of lockdown
 p0 = plot_cum_deaths(list(proj_tiers, proj_ldW1o, proj_ldW2o, proj_ldW3o, proj_ldW4o, proj_ldW5o, proj_ldW6o), 
     c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
-    "2020-10-01", ystart = 25.9, ydiff = -1.7, titl = "Duration of lockdown")
+    "2020-10-01", ystart = 48.3, ydiff = -3.2, titl = "Duration of lockdown")
 p1 = plot_icu(list(proj_tiers, proj_ldW1o, proj_ldW2o, proj_ldW3o, proj_ldW4o, proj_ldW5o, proj_ldW6o), 
     c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
     "2020-10-01")
@@ -238,19 +244,19 @@ p8 = plot_indicators_england_stack(series_weeks, c(
 
 theme_set(theme_cowplot(font_size = 6))
 pp2 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
-ggsave("./figures/newnew_big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
+ggsave("./figures/big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
 
 
 # Comparative plots: Timing of lockdown
 p0 = plot_cum_deaths(list(proj_ldW4o_10_08, proj_ldW4o_10_15, proj_ldW4o_10_22, proj_ldW4o_10_29, proj_ldW4o_11_05, proj_ldW4o_11_12, proj_ldW4o_11_19), 
     c(  "                  8 Oct", 
         "                      15 Oct", 
-        "                          22 Oct", 
+        "                           22 Oct", 
         "29 Oct", 
         "5 Nov", 
         "12 Nov", 
         "19 Nov"), 
-    "2020-10-01", ystart = 21.6, ydiff = -1.35, titl = "Timing of lockdown")
+    "2020-10-01", ystart = 45.8, ydiff = -2.85, titl = "Timing of lockdown")
 p1 = plot_icu(list(proj_ldW4o_10_08, proj_ldW4o_10_15, proj_ldW4o_10_22, proj_ldW4o_10_29, proj_ldW4o_11_05, proj_ldW4o_11_12, proj_ldW4o_11_19), 
     c(  "                  8 Oct", 
         "                      15 Oct", 
@@ -299,18 +305,9 @@ ggsave("./figures/big.png", pp, width = 21, height = 12, units = "cm")
 proj_ldE4o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
 proj_ldE4c = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration = 27, lockdown = lockdownE, se = seE, close_schools = TRUE,  cb_behaviour = "default", expire = "2020-10-13")
 
-plot_projection(list(proj_basic, proj_tiers), list("No tiers", "Tiers"), "2020-10-01", "Dark2")
-ggsave("./figures/NEW_proj_tiers.png", width = 24, height = 12, units = "cm")
-ggsave("./figures/NEW_proj_tiers.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
-plot_projection(list(proj_tiers, proj_ldN4o, proj_ldN4c), list("Tiers only", "NI lockdown, schools open", "NI lockdown, schools closed"), "2020-10-01", "Set2")
-ggsave("./figures/NEW_proj_ld_N.png", width = 24, height = 12, units = "cm")
-ggsave("./figures/NEW_proj_ld_N.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
-plot_projection(list(proj_tiers, proj_ldW4o, proj_ldW4c), list("Tiers only", "Wales lockdown, schools open", "Wales lockdown, schools closed"), "2020-10-01", "Set2")
-ggsave("./figures/NEW_proj_ld_W.png", width = 24, height = 12, units = "cm")
-ggsave("./figures/NEW_proj_ld_W.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
 plot_projection(list(proj_tiers, proj_ldE4o, proj_ldE4c), list("Tiers only", "England lockdown, schools open", "England lockdown, schools closed"), "2020-10-01", "Set2")
-ggsave("./figures/NEW_proj_ld_E.png", width = 24, height = 12, units = "cm")
-ggsave("./figures/NEW_proj_ld_E.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/proj_ld_E.png", width = 24, height = 12, units = "cm")
+ggsave("./figures/proj_ld_E.pdf", width = 24, height = 12, units = "cm", useDingbats = FALSE)
 
 # Different duration of lockdown
 proj_ldE1o = project(england_pops, tiers =  TRUE, tier2 = tier2, tier3 = tier3, cb_date = "2020-11-05", cb_duration =  6, lockdown = lockdownE, se = seE, close_schools = FALSE, cb_behaviour = "default", expire = "2020-10-13")
@@ -374,7 +371,7 @@ series_what[, scenario := factor(scenario, unique(scenario))]
 # Comparative plots: Type of intervention
 p0 = plot_cum_deaths(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c, proj_ldE4o, proj_ldE4c), 
     c("Nothing", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c", "Ld E/o", "Ld E/c"), 
-    "2020-10-01", ystart = 29.6, ydiff = -2, titl = "Type of intervention")
+    "2020-10-01", ystart = 56, ydiff = -3.8, titl = "Type of intervention")
 p1 = plot_icu(list(proj_basic, proj_tiers, proj_ldN4o, proj_ldN4c, proj_ldW4o, proj_ldW4c, proj_ldE4o, proj_ldE4c), 
     c("Nothing", "Tiers", "Ld N/o", "Ld N/c", "Ld W/o", "Ld W/c", "Ld E/o", "Ld E/c"), 
     "2020-10-01")
@@ -387,13 +384,13 @@ p8 = plot_indicators_england_stack(series_what, c(
 
 theme_set(theme_cowplot(font_size = 6))
 pp1 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
-ggsave("./figures/NEW_big_what.pdf", pp1, width = 7, height = 12, units = "cm")
+ggsave("./figures/ENG_big_what.pdf", pp1, width = 7, height = 12, units = "cm")
 
 
 # Comparative plots: Duration of lockdown
 p0 = plot_cum_deaths(list(proj_tiers, proj_ldE1o, proj_ldE2o, proj_ldE3o, proj_ldE4o, proj_ldE5o, proj_ldE6o), 
     c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
-    "2020-10-01", ystart = 25.9, ydiff = -1.7, titl = "Duration of lockdown")
+    "2020-10-01", ystart = 48.5, ydiff = -3.2, titl = "Duration of lockdown")
 p1 = plot_icu(list(proj_tiers, proj_ldE1o, proj_ldE2o, proj_ldE3o, proj_ldE4o, proj_ldE5o, proj_ldE6o), 
     c("No lockdown", "1 week", "2 weeks", "3 weeks", "4 weeks", "5 weeks", "6 weeks"), 
     "2020-10-01")
@@ -406,7 +403,7 @@ p8 = plot_indicators_england_stack(series_weeks, c(
 
 theme_set(theme_cowplot(font_size = 6))
 pp2 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
-ggsave("./figures/NEW_big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
+ggsave("./figures/ENG_big_duration.pdf", pp2, width = 7, height = 12, units = "cm")
 
 
 # Comparative plots: Timing of lockdown
@@ -418,7 +415,7 @@ p0 = plot_cum_deaths(list(proj_ldE4o_10_08, proj_ldE4o_10_15, proj_ldE4o_10_22, 
         "5 Nov", 
         "12 Nov", 
         "19 Nov"), 
-    "2020-10-01", ystart = 23.6, ydiff = -1.43, titl = "Timing of lockdown")
+    "2020-10-01", ystart = 48.5, ydiff = -2.9, titl = "Timing of lockdown")
 p1 = plot_icu(list(proj_ldE4o_10_08, proj_ldE4o_10_15, proj_ldE4o_10_22, proj_ldE4o_10_29, proj_ldE4o_11_05, proj_ldE4o_11_12, proj_ldE4o_11_19), 
     c(  "                  8 Oct", 
         "                      15 Oct", 
@@ -437,9 +434,9 @@ p8 = plot_indicators_england_stack(series_timing, c(
 
 theme_set(theme_cowplot(font_size = 6))
 pp3 = plot_grid(p0, p7, p8, ncol = 1, rel_heights = c(2.8, 2, 2), align = "v", axis = "bottom")
-ggsave("./figures/NEW_big_timing.pdf", pp3, width = 7, height = 12, units = "cm")
+ggsave("./figures/ENG_big_timing.pdf", pp3, width = 7, height = 12, units = "cm")
 
 
 pp = plot_grid(pp1, pp2, pp3, nrow = 1, label_size = 8, labels = letters)
-ggsave("./figures/NEW_big.pdf", pp, width = 21, height = 12, units = "cm", useDingbats = FALSE)
-ggsave("./figures/NEW_big.png", pp, width = 21, height = 12, units = "cm")
+ggsave("./figures/ENG_big.pdf", pp, width = 21, height = 12, units = "cm", useDingbats = FALSE)
+ggsave("./figures/ENG_big.png", pp, width = 21, height = 12, units = "cm")

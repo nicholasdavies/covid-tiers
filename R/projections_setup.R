@@ -490,8 +490,8 @@ cpp_chgI_close_schools = function(cb_dates, cb_durations)
 {
     cb_durations = rep_len(cb_durations, length(cb_dates))
     ret = c(
-        'P.changes.ch[5].values = { vector<double>(8, x[18]) };',
-        'P.changes.ch[5].times = { x[24] };'
+        'P.changes.ch[5].values = { vector<double>(8, x[15]) };',
+        'P.changes.ch[5].times = { x[17] };'
     )
     
     for (k in seq_along(cb_dates)) {
@@ -505,9 +505,8 @@ cpp_chgI_close_schools = function(cb_dates, cb_durations)
             '{',
             glue::glue('double school_close = {cb_t0}, school_open = {cb_t1};'),
             
-            # Sep boost
             'P.changes.ch[5].values.push_back(vector<double>(8, 1.0));',
-            'P.changes.ch[5].values.push_back(vector<double>(8, x[18]));',
+            'P.changes.ch[5].values.push_back(vector<double>(8, x[15]));',
             'P.changes.ch[5].times.push_back(school_close);',
             'P.changes.ch[5].times.push_back(school_open + 1);',
     
@@ -731,14 +730,20 @@ arrs_tier = function(proj) {
         trace[tier_0 == 3 & tier_1 == 3 & tier_2 == 2 & tier_3 == 2, .(effect = Rt_0 / Rt_3), by = .(run, population)]
     )
     
+    tier_1_to_3 = cbind(
+        tier_1_to_2[, .(t1_2 = sample(effect, 1000, replace = TRUE)), by = population],
+        tier_2_to_3[, .(t2_3 = sample(effect, 1000, replace = TRUE)), by = population]
+    )
+    tier_1_to_3[, effect := t1_2 * t2_3]
+    
     table_t2 = rbind(
         tier_1_to_2[, .(population = "England", `Tier 1 to Tier 2` = nicepc(1 - effect))],
         tier_1_to_2[, .(`Tier 1 to Tier 2` = nicepc(1 - effect)), keyby = population]
     )
 
     table_t3 = rbind(
-        tier_2_to_3[, .(population = "England", `Tier 2 to Tier 3` = nicepc(1 - effect))],
-        tier_2_to_3[, .(`Tier 2 to Tier 3` = nicepc(1 - effect)), keyby = population]
+        tier_1_to_3[, .(population = "England", `Tier 1 to Tier 3` = nicepc(1 - effect))],
+        tier_1_to_3[, .(`Tier 1 to Tier 3` = nicepc(1 - effect)), keyby = population]
     )
     
     merge(table_t2, table_t3, by = "population", all = TRUE, sort = FALSE)
